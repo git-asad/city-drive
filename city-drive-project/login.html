@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Drive - Login</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <img src="assets/logo.svg" alt="City Drive" class="login-logo">
+                <h1>Welcome to City Drive</h1>
+                <p>Sign in to access your account</p>
+            </div>
+
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" required placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="Enter your password">
+                </div>
+
+                <div class="form-group">
+                    <label for="user-type">I am a:</label>
+                    <select id="user-type" required>
+                        <option value="">Select user type</option>
+                        <option value="client">Client</option>
+                        <option value="owner">Car Owner</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-login">Sign In</button>
+            </form>
+
+            <div class="login-footer">
+                <p>Don't have an account? <a href="#" onclick="showSignup()">Sign up</a></p>
+                <p><a href="#" onclick="forgotPassword()">Forgot password?</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Account</h2>
+                <span class="close" onclick="closeModal('signup-modal')">&times;</span>
+            </div>
+            <form id="signup-form" class="auth-form">
+                <div class="form-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-type">Account Type</label>
+                    <select id="signup-type" required>
+                        <option value="client">Client</option>
+                        <option value="owner">Car Owner</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Login functionality
+        function showSignup() {
+            document.getElementById('signup-modal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Handle login form
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const userType = document.getElementById('user-type').value;
+
+            if (!email || !password || !userType) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // Simple authentication (in real app, this would be server-side)
+            if (email && password) {
+                // Create user object
+                const user = {
+                    name: email.split('@')[0],
+                    email: email,
+                    type: userType
+                };
+
+                // Store in localStorage
+                localStorage.setItem('currentUser', JSON.stringify(user));
+
+                // Redirect based on user type
+                if (userType === 'client') {
+                    window.location.href = 'client/index.html';
+                } else if (userType === 'owner') {
+                    window.location.href = 'owner/index.html';
+                }
+
+                console.log('Login successful!');
+            } else {
+                alert('Invalid credentials');
+            }
+        });
+
+        // Handle signup form
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const userType = document.getElementById('signup-type').value;
+
+            if (!name || !email || !password || !userType) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // Create user object
+            const user = {
+                name: name,
+                email: email,
+                type: userType
+            };
+
+            // Store in localStorage
+            localStorage.setItem('currentUser', JSON.stringify(user));
+
+            alert('Account created successfully!');
+
+            // Redirect based on user type
+            if (userType === 'client') {
+                window.location.href = 'client/index.html';
+            } else if (userType === 'owner') {
+                window.location.href = 'owner/index.html';
+            }
+        });
+
+        // Check if already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser) {
+                // Redirect to appropriate dashboard
+                if (currentUser.type === 'client') {
+                    window.location.href = 'client/index.html';
+                } else if (currentUser.type === 'owner') {
+                    window.location.href = 'owner/index.html';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

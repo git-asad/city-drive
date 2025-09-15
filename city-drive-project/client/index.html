@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Drive - Luxury Car Rental</title>
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo-section">
+                <img src="../assets/logo.svg" alt="City Drive" class="logo">
+                <span class="tagline">Premium Car Rental</span>
+            </div>
+            <nav class="nav">
+                <a href="#home" class="active">Home</a>
+                <a href="#cars">Cars</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </nav>
+            <div class="header-actions">
+                <div class="user-menu" id="user-menu" style="display: none;">
+                    <span id="user-name">Client Name</span>
+                    <button onclick="logout()" class="btn-secondary">Logout</button>
+                </div>
+                <div class="guest-menu" id="guest-menu">
+                    <button onclick="goToLogin()" class="btn-primary">Login</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <h1 class="hero-title animate-fade-in">Drive Luxury.<br>Experience Freedom.</h1>
+                <p class="hero-subtitle animate-fade-in-delay">Rent premium cars with ease and style. Discover the perfect vehicle for your journey.</p>
+                <div class="hero-buttons animate-slide-up">
+                    <button onclick="document.getElementById('cars-section').scrollIntoView({behavior: 'smooth'})" class="btn-luxury-primary">View Cars</button>
+                    <button onclick="goToLogin()" class="btn-luxury-secondary">Book Now</button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="../assets/main_car.png" alt="Luxury Car" class="hero-car-image">
+            </div>
+        </section>
+
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="container">
+                <div class="search-card">
+                    <h2>Find Your Perfect Car</h2>
+                    <form class="search-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Pickup Location</label>
+                                <select id="pickup-location" required>
+                                    <option value="">Select Location</option>
+                                    <option value="New York">New York</option>
+                                    <option value="Los Angeles">Los Angeles</option>
+                                    <option value="Houston">Houston</option>
+                                    <option value="Chicago">Chicago</option>
+                                </select>
+                                <p id="location-display">Choose your pickup location</p>
+                            </div>
+                            <div class="form-group">
+                                <label>Pick-up Date</label>
+                                <input type="date" id="pickup-date" min="" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Return Date</label>
+                                <input type="date" id="return-date" required>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn-search-luxury">Search Cars</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Cars Section -->
+        <section id="cars-section" class="featured-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2 class="animate-slide-up">Featured Luxury Vehicles</h2>
+                    <p class="animate-slide-up-delay">Explore our selection of premium vehicles available for your next adventure.</p>
+                </div>
+                <div class="cars-grid" id="featured-cars">
+                    <!-- Cars will be loaded here -->
+                </div>
+                <div class="explore-more">
+                    <button onclick="window.location.href='index.html'" class="btn-luxury-outline">
+                        Explore all cars <img src="../assets/arrow_icon.svg" alt="arrow">
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Banner Section -->
+        <section class="banner">
+            <div class="container">
+                <div class="banner-content">
+                    <h2>Do You Own a Luxury Car?</h2>
+                    <p>Monetize your vehicle effortlessly by listing it on City Drive.</p>
+                    <p>We take care of insurance, driver verification and secure payments - so you can earn passive income, stress-free.</p>
+                    <button onclick="goToLogin()" class="btn-banner">List your car</button>
+                </div>
+                <div class="banner-image">
+                    <img src="../assets/banner_car_image.png" alt="Banner Car">
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="testimonials">
+            <div class="container">
+                <div class="section-title">
+                    <h2>What Our Customers Say</h2>
+                    <p>Discover why discerning travelers choose City Drive for their luxury accommodations around the world.</p>
+                </div>
+                <div class="testimonials-grid">
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <img src="../assets/testimonial_image_1.png" alt="Emma Rodriguez">
+                            <div>
+                                <h4>Emma Rodriguez</h4>
+                                <p>Barcelona, Spain</p>
+                            </div>
+                        </div>
+                        <div class="stars">
+                            <img src="../assets/star_icon.svg" alt="star">
+                            <img src="../assets/star_icon.svg" alt="star">
+                            <img src="../assets/star_icon.svg" alt="star">
+                            <img src="../assets/star_icon.svg" alt="star">
+                            <img src="../assets/star_icon.svg" alt="star">
+                        </div>
+                        <p>"I've rented cars from various companies, but the experience with City Drive was exceptional."</p>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <img src="../assets/testimonial_image_2.png" alt="John Smith">
+                            <div>
+                                <h4>John Smith</h4>
+                                <p>New York, USA</p>
+                            </div>
+                        </div>
+                        <div class="stars">
+                            <img src="../assets/star_icon.svg" alt="star">
+                            <img src="../assets/star_icon.svg" alt="star">
+                            <img src="../assets/star_icon.svg" alt="star">
+                            <img src="../assets/star_icon.svg" alt="star">
+                            <img src="../assets/star_icon.svg" alt="star">
+                        </div>
+                        <p>"City Drive made my trip so much easier. The car was delivered right to my door, and the customer service was fantastic!"</p>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <img src="../assets/testimonial_image_1.png" alt="Ava Johnson">
+                            <div>
+                                <h4>Ava Johnson</h4>
+                                <p>Sydney, Australia</p>
+                            </div>
+                        </div>
+                        <div class="stars">
+                            <img src="../assets/star_icon.svg" alt="star">
+                            <img src="../assets/star_icon.svg" alt="star">
+                            <img src="../assets/star_icon.svg" alt="star">
+                            <img src="../assets/star_icon.svg" alt="star">
+                            <img src="../assets/star_icon.svg" alt="star">
+                        </div>
+                        <p>"I highly recommend City Drive! Their fleet is amazing, and I always feel like I'm getting the best deal with excellent service."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter Section -->
+        <section class="newsletter">
+            <div class="container">
+                <h2>Never Miss a Deal!</h2>
+                <p>Subscribe to get the latest offers, new arrivals, and exclusive discounts</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Enter your email id" required>
+                    <button type="submit" class="btn-primary">Subscribe</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Luxury CTA Section -->
+        <section class="luxury-cta">
+            <div class="container">
+                <div class="cta-content">
+                    <h2 class="animate-pulse">Ready to Ride?</h2>
+                    <p>Experience the luxury of driving premium vehicles. Book your perfect car today.</p>
+                    <button onclick="goToLogin()" class="btn-luxury-cta">Book Your Car Now</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- My Bookings Section (only for logged in users) -->
+        <section class="my-bookings" id="bookings" style="display: none;">
+            <div class="container">
+                <h2>My Bookings</h2>
+                <div class="bookings-container" id="bookings-list">
+                    <!-- Bookings will be loaded here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 City Drive. Luxury car rental made simple.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

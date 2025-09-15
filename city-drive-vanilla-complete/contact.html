@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - City Drive</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Modern color scheme variables */
+        :root {
+            --modern-indigo: #6366f1;
+            --modern-purple: #8b5cf6;
+            --modern-cyan: #06b6d4;
+            --modern-white: #ffffff;
+            --modern-gray: #f8fafc;
+            --modern-dark: #1e293b;
+            --modern-light: #f1f5f9;
+        }
+
+        /* Contact Page Styles */
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            min-height: 100vh;
+        }
+
+        .contact-hero {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+            color: white;
+            padding: 80px 0 60px;
+            text-align: center;
+        }
+
+        .contact-hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-hero p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .contact-main {
+            max-width: 1200px;
+            margin: -40px auto 80px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        .contact-info-section {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .info-card-large {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .info-card-large:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.15);
+        }
+
+        .info-icon-large {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .info-card-large h3 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .info-card-large p {
+            color: #64748b;
+            margin: 8px 0;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .info-card-large .highlight {
+            color: #6366f1;
+            font-weight: 600;
+        }
+
+        .contact-form-section {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-form-section h2 {
+            font-size: 2.2rem;
+            color: #1e293b;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .contact-form-section p {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 16px 18px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: white;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 140px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border: none;
+            padding: 18px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .form-note {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            margin-top: 80px;
+            text-align: center;
+        }
+
+        .faq-section h2 {
+            font-size: 2.5rem;
+            color: #1e293b;
+            margin-bottom: 15px;
+        }
+
+        .faq-section p {
+            color: #64748b;
+            font-size: 1.2rem;
+            margin-bottom: 50px;
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            text-align: left;
+        }
+
+        .faq-item {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .faq-item h3 {
+            color: #1e293b;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .faq-item p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        /* Loading Animation */
+        .luxury-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        }
+
+        .luxury-loader.loaded {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loader-logo {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #6366f1, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: logoGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoGlow {
+            0% {
+                filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.5));
+            }
+            100% {
+                filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.8));
+            }
+        }
+
+        .loader-text {
+            font-size: 18px;
+            opacity: 0.8;
+            animation: textPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes textPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 400px;
+            animation: slideInRight 0.3s ease;
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #10b981;
+        }
+
+        .notification-success .notification-content {
+            border-left-color: #10b981;
+        }
+
+        .notification-error .notification-content {
+            border-left-color: #ef4444;
+        }
+
+        .notification-icon {
+            font-size: 1.2rem;
+        }
+
+        .notification-message {
+            flex: 1;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #9ca3af;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-close:hover {
+            color: #6b7280;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .contact-hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .contact-hero p {
+                font-size: 1.1rem;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .contact-form-section {
+                padding: 30px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .info-card-large {
+                padding: 30px;
+            }
+
+            .info-icon-large {
+                font-size: 3rem;
+            }
+
+            .faq-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .notification {
+                left: 20px;
+                right: 20px;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Luxury Loading Screen -->
+    <div id="luxury-loader" class="luxury-loader">
+        <div class="loader-content">
+            <div class="loader-logo">City Drive</div>
+            <div class="loader-text">Connecting You</div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html">
+                    <img src="assets/logo.svg" alt="City Drive" onclick="window.location.href='index.html'">
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="index.html#home" class="nav-link">Home</a>
+                <a href="index.html#cars" class="nav-link">Cars</a>
+                <a href="my-bookings.html" class="nav-link">My Bookings</a>
+                <a href="contact.html" class="nav-link active">Contact</a>
+                <a href="#about" class="nav-link">About</a>
+            </div>
+            <div class="nav-auth">
+                <button onclick="showLoginModal()" class="btn-secondary">Login</button>
+                <button onclick="showSignupModal()" class="btn-primary">Sign Up</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contact Hero -->
+    <section class="contact-hero">
+        <div class="container">
+            <h1>Contact Us</h1>
+            <p>Get in touch with our luxury car rental experts. We're here to make your journey exceptional.</p>
+        </div>
+    </section>
+
+    <!-- Contact Main Content -->
+    <div class="contact-main">
+        <div class="contact-grid">
+            <!-- Contact Information -->
+            <div class="contact-info-section">
+                <div class="info-card-large">
+                    <span class="info-icon-large">📞</span>
+                    <h3>Phone Support</h3>
+                    <p><span class="highlight">+1 (555) 123-4567</span></p>
+                    <p>24/7 Customer Service</p>
+                    <p>Available for immediate assistance</p>
+                </div>
+
+                <div class="info-card-large">
+                    <span class="info-icon-large">📧</span>
+                    <h3>Email Support</h3>
+                    <p><span class="highlight">support@citydrive.com</span></p>
+                    <p>Response within 2 hours</p>
+                    <p>Detailed inquiries and booking assistance</p>
+                </div>
+
+                <div class="info-card-large">
+                    <span class="info-icon-large">📍</span>
+                    <h3>Visit Our Office</h3>
+                    <p><span class="highlight">123 Luxury Lane</span></p>
+                    <p>New York, NY 10001</p>
+                    <p>Mon-Fri: 9AM-6PM, Sat: 10AM-4PM</p>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="contact-form-section">
+                <h2>Send us a Message</h2>
+                <p>Have questions about our services? Need help with a booking? We're here to help!</p>
+
+                <form class="contact-form" onsubmit="handleContactSubmit(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact-name">Full Name</label>
+                            <input type="text" id="contact-name" name="name" required placeholder="Enter your full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-email">Email Address</label>
+                            <input type="email" id="contact-email" name="email" required placeholder="Enter your email">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contact-subject">Subject</label>
+                        <select id="contact-subject" name="subject" required>
+                            <option value="">Select a subject</option>
+                            <option value="booking">Booking Inquiry</option>
+                            <option value="pricing">Pricing Questions</option>
+                            <option value="support">Technical Support</option>
+                            <option value="feedback">Feedback</option>
+                            <option value="partnership">Partnership Opportunities</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contact-message">Message</label>
+                        <textarea id="contact-message" name="message" rows="6" required placeholder="Tell us how we can help you..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <span class="btn-icon">📤</span>
+                        Send Message
+                    </button>
+
+                    <div class="form-note">
+                        <span>🔒</span>
+                        <span>Your information is secure and will never be shared</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <section class="faq-section">
+            <h2>Frequently Asked Questions</h2>
+            <p>Find quick answers to common questions about our services</p>
+
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3>🚗 What types of vehicles do you offer?</h3>
+                    <p>We offer a premium fleet including luxury sedans, SUVs, sports cars, and electric vehicles from top brands like BMW, Mercedes, Porsche, and Tesla.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3>💰 What are your rental rates?</h3>
+                    <p>Our rates start from $89/day for economy vehicles and go up to $450/day for luxury and sports cars. All rates include insurance and GPS.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3>📅 What's your minimum rental period?</h3>
+                    <p>Our minimum rental period is 24 hours, but we offer flexible terms for longer rentals with discounted daily rates.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3>🛡️ Is insurance included?</h3>
+                    <p>Yes, all our rentals include comprehensive insurance coverage with zero deductible options available for additional peace of mind.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3>📍 Where can I pick up my rental car?</h3>
+                    <p>We offer pickup from major airports, downtown locations, and can arrange delivery to your hotel or residence in most metropolitan areas.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3>🔄 Can I modify or cancel my booking?</h3>
+                    <p>You can modify your booking up to 24 hours before pickup at no charge. Cancellations made within 24 hours may incur a fee.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>City Drive</h3>
+                <p>Your trusted car rental platform for luxury vehicles</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">📘</a>
+                    <a href="#" class="social-link">🐦</a>
+                    <a href="#" class="social-link">📷</a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html#home">Home</a></li>
+                    <li><a href="index.html#cars">Cars</a></li>
+                    <li><a href="my-bookings.html">My Bookings</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="#about">About</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Services</h4>
+                <ul>
+                    <li><a href="#">Car Rental</a></li>
+                    <li><a href="#">Luxury Fleet</a></li>
+                    <li><a href="#">Airport Transfer</a></li>
+                    <li><a href="#">Chauffeur Service</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2024 City Drive. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Contact Page Specific JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loading overlay
+            setTimeout(() => {
+                document.getElementById('luxury-loader').classList.add('loaded');
+            }, 1000);
+        });
+
+        function handleContactSubmit(event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const contactData = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                subject: formData.get('subject'),
+                message: formData.get('message')
+            };
+
+            // Show loading state
+            const submitBtn = event.target.querySelector('.btn-submit');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="btn-icon">⏳</span> Sending...';
+            submitBtn.disabled = true;
+
+            // Simulate form submission (in real app, this would send to backend)
+            setTimeout(() => {
+                console.log('Contact form submitted:', contactData);
+
+                // Show success message
+                showNotification('Thank you for contacting us! We\'ll get back to you within 24 hours.', 'success');
+
+                // Reset form
+                event.target.reset();
+
+                // Reset button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 2000);
+        }
+
+        function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => notification.remove());
+
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <span class="notification-icon">${type === 'success' ? '✅' : 'ℹ️'}</span>
+                    <span class="notification-message">${message}</span>
+                    <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.style.animation = 'slideOutRight 0.3s ease';
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, 5000);
+        }
+
+        // Navigation functions (imported from main script)
+        function showLoginModal() {
+            window.location.href = 'login.html';
+        }
+
+        function showSignupModal() {
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

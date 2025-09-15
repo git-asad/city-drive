@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');@import"tailwindcss";*{font-family:"Montserrat","Outfit",sans-serif}:root{--color-primary:#7c3aed;--color-primary-dull:#a78bfa;--color-accent:#f472b6;--color-accent-2:#2dd4bf;--color-light:#f8fafc;--color-bg-gradient:linear-gradient(135deg,#f8fafc 0%,#e0e7ff 100%);--color-borderColor:#e5e7eb;--color-text:#1e293b}@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}@keyframes fadeInLeft{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}@keyframes fadeInRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}@keyframes bounceIn{0%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1.05)}70%{transform:scale(.9)}100%{opacity:1;transform:scale(1)}}@keyframes slideInUp{from{opacity:0;transform:translateY(100px)}to{opacity:1;transform:translateY(0)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}@keyframes shimmer{0%{background-position:-200px 0}100%{background-position:calc(200px + 100%) 0}}.animate-fade-in-up{animation:fadeInUp .8s ease-out forwards}.animate-fade-in-left{animation:fadeInLeft .8s ease-out forwards}.animate-fade-in-right{animation:fadeInRight .8s ease-out forwards}.animate-bounce-in{animation:bounceIn .8s ease-out forwards}.animate-slide-in-up{animation:slideInUp .8s ease-out forwards}.animate-pulse-slow{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}.animate-float{animation:float 3s ease-in-out infinite}.animate-shimmer{background:linear-gradient(90deg,transparent,rgba(255,255,255,.4));background-size:200px 100%;animation:shimmer 2s infinite}.animation-delay-100{animation-delay:.1s}.animation-delay-200{animation-delay:.2s}.animation-delay-300{animation-delay:.3s}.animation-delay-400{animation-delay:.4s}.animation-delay-500{animation-delay:.5s}.animation-delay-600{animation-delay:.6s}.animation-delay-700{animation-delay:.7s}.animation-delay-800{animation-delay:.8s}.animation-delay-900{animation-delay:.9s}.animation-delay-1000{animation-delay:1s}.transition-smooth{transition:all .3s cubic-bezier(.4,0,.2,1)}.transition-bounce{transition:all .3s cubic-bezier(.68,-.55,.265,1.55)}.hover-lift{transition:transform .3s ease,box-shadow .3s ease}.hover-lift:hover{transform:translateY(-8px);box-shadow:0 20px 40px rgba(0,0,0,.1)}.hover-scale{transition:transform .3s ease}.hover-scale:hover{transform:scale(1.05)}.hover-glow{transition:box-shadow .3s ease}.hover-glow:hover{box-shadow:0 0 20px rgba(59,130,246,.5)}.loading-spinner{border:4px solid #f3f3f3;border-top:4px solid #3498db;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.fade-in-on-scroll{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s ease}.fade-in-on-scroll.visible{opacity:1;transform:translateY(0)}@keyframes fadeInScale{from{opacity:0;transform:scale(.8) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}.animate-on-scroll{opacity:0;transform:scale(.8) translateY(20px);transition:opacity .6s ease,transform .6s ease}.animate-on-scroll.animate{opacity:1;transform:scale(1) translateY(0);animation:fadeInScale .6s ease forwards}.stagger-1{animation-delay:.1s}.stagger-2{animation-delay:.2s}.stagger-3{animation-delay:.3s}.stagger-4{animation-delay:.4s}.stagger-5{animation-delay:.5s}.stagger-6{animation-delay:.6s}.page-enter{opacity:0;transform:translateY(20px)}.page-enter-active{opacity:1;transform:translateY(0);transition:opacity .5s ease,transform .5s ease}.page-exit{opacity:1;transform:translateY(0)}.page-exit-active{opacity:0;transform:translateY(-20px);transition:opacity .3s ease,transform .3s ease}
+
+/*
+PERFORMANCE OPTIMIZATION NOTES:
+===============================
+
+1. MINIFICATION COMPLETE:
+   - Removed all unnecessary whitespace and comments
+   - Combined selectors where possible
+   - Maintained all functionality and classes
+
+2. CDN & CACHING RECOMMENDATIONS:
+   - Host fonts on your own CDN or use font-display: swap
+   - Add cache headers for static assets (CSS, JS, images)
+   - Use service worker for caching strategies
+   - Consider using a CDN like Cloudflare for global distribution
+
+3. PURGECSS WHITELIST (if using):
+   - All modal classes: modal, modal-open, modal-backdrop, fade, show
+   - Form classes: form-control, is-valid, is-invalid, was-validated
+   - Hidden/utility classes: d-none, d-block, invisible, collapse
+   - Animation classes: animate-*, fade-*, slide-*, bounce-*
+   - Responsive classes: d-*-none, d-*-block, col-*, order-*
+   - Component classes: dropdown-menu, tooltip, popover, carousel
+
+4. IMAGE OPTIMIZATION:
+   - Use WebP format with JPEG fallbacks
+   - Implement responsive images with srcset
+   - Consider using image CDNs like Cloudinary or Imgix
+
+5. ADDITIONAL OPTIMIZATIONS:
+   - Use CSS Grid instead of Flexbox where appropriate
+   - Consider using CSS-in-JS for component-scoped styles
+   - Implement critical CSS for above-the-fold content
+*/

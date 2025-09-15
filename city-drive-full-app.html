@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Drive - Car Rental App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .auth-section, .dashboard {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .auth-section {
+            display: block;
+        }
+
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .role-selector label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            transition: box-shadow 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            color: #4facfe;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .data-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h4 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+        }
+
+        .user-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .user-info p {
+            margin-bottom: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 City Drive</h1>
+            <p>Your Premium Car Rental Experience</p>
+        </div>
+
+        <!-- Authentication Section -->
+        <div id="auth-section" class="auth-section">
+            <div class="grid">
+                <div class="card">
+                    <h3>🔐 Sign Up</h3>
+                    <div class="role-selector">
+                        <label>
+                            <input type="radio" name="signup-role" value="customer" checked>
+                            👤 Customer
+                        </label>
+                        <label>
+                            <input type="radio" name="signup-role" value="owner">
+                            🏢 Car Owner
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-email">Email:</label>
+                        <input type="email" id="signup-email" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password:</label>
+                        <input type="password" id="signup-password" placeholder="Min 6 characters" required>
+                    </div>
+                    <button class="btn" onclick="signUp()">Create Account</button>
+                </div>
+
+                <div class="card">
+                    <h3>🔑 Sign In</h3>
+                    <div class="form-group">
+                        <label for="signin-email">Email:</label>
+                        <input type="email" id="signin-email" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signin-password">Password:</label>
+                        <input type="password" id="signin-password" placeholder="Your password" required>
+                    </div>
+                    <button class="btn btn-secondary" onclick="signIn()">Sign In</button>
+                </div>
+            </div>
+
+            <div id="auth-status" class="status info">Ready to authenticate...</div>
+        </div>
+
+        <!-- Owner Dashboard -->
+        <div id="owner-dashboard" class="dashboard">
+            <div class="user-info">
+                <h3>🏢 Owner Dashboard</h3>
+                <p id="owner-info">Welcome back!</p>
+                <button class="btn btn-danger" onclick="signOut()" style="width: auto; margin-top: 10px;">Sign Out</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4 id="total-cars">0</h4>
+                    <p>My Cars</p>
+                </div>
+                <div class="stat-card">
+                    <h4 id="total-bookings">0</h4>
+                    <p>Total Bookings</p>
+                </div>
+                <div class="stat-card">
+                    <h4 id="total-revenue">$0</h4>
+                    <p>Revenue</p>
+                </div>
+                <div class="stat-card">
+                    <h4 id="pending-bookings">0</h4>
+                    <p>Pending</p>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>➕ Add New Car</h3>
+                    <div class="form-group">
+                        <label for="car-name">Car Name:</label>
+                        <input type="text" id="car-name" placeholder="BMW X5">
+                    </div>
+                    <div class="form-group">
+                        <label for="car-model">Model:</label>
+                        <input type="text" id="car-model" placeholder="2023">
+                    </div>
+                    <div class="form-group">
+                        <label for="car-price">Daily Price ($):</label>
+                        <input type="number" id="car-price" placeholder="150">
+                    </div>
+                    <div class="form-group">
+                        <label for="car-location">Location:</label>
+                        <input type="text" id="car-location" placeholder="Downtown">
+                    </div>
+                    <button class="btn" onclick="addCar()">Add Car</button>
+                </div>
+
+                <div class="card">
+                    <h3>🚗 My Cars</h3>
+                    <button class="btn btn-secondary" onclick="loadOwnerCars()">Refresh Cars</button>
+                    <div id="owner-cars-list" class="data-display">Loading your cars...</div>
+                </div>
+
+                <div class="card">
+                    <h3>📋 All Bookings</h3>
+                    <button class="btn btn-secondary" onclick="loadAllBookings()">Refresh Bookings</button>
+                    <div id="owner-bookings-list" class="data-display">Loading bookings...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Dashboard -->
+        <div id="customer-dashboard" class="dashboard">
+            <div class="user-info">
+                <h3>👤 Customer Dashboard</h3>
+                <p id="customer-info">Welcome back!</p>
+                <button class="btn btn-danger" onclick="signOut()" style="width: auto; margin-top: 10px;">Sign Out</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4 id="my-bookings-count">0</h4>
+                    <p>My Bookings</p>
+                </div>
+                <div class="stat-card">
+                    <h4 id="total-spent">$0</h4>
+                    <p>Total Spent</p>
+                </div>
+                <div class="stat-card">
+                    <h4 id="active-bookings">0</h4>
+                    <p>Active</p>
+                </div>
+                <div class="stat-card">
+                    <h4 id="completed-bookings">0</h4>
+                    <p>Completed</p>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>🚗 Available Cars</h3>
+                    <button class="btn" onclick="loadAvailableCars()">Browse Cars</button>
+                    <div id="available-cars-list" class="data-display">Loading available cars...</div>
+                </div>
+
+                <div class="card">
+                    <h3>📅 Make a Booking</h3>
+                    <div class="form-group">
+                        <label for="book-car-id">Car ID:</label>
+                        <input type="text" id="book-car-id" placeholder="Enter car ID from list">
+                    </div>
+                    <div class="form-group">
+                        <label for="book-start-date">Start Date:</label>
+                        <input type="date" id="book-start-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="book-end-date">End Date:</label>
+                        <input type="date" id="book-end-date" required>
+                    </div>
+                    <button class="btn" onclick="createBooking()">Book Car</button>
+                </div>
+
+                <div class="card">
+                    <h3>📋 My Bookings</h3>
+                    <button class="btn btn-secondary" onclick="loadMyBookings()">Refresh Bookings</button>
+                    <div id="my-bookings-list" class="data-display">Loading your bookings...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="card">
+            <h3>📊 System Status</h3>
+            <div id="system-status" class="status info">Initializing City Drive...</div>
+            <div id="system-logs" class="data-display">System logs will appear here...</div>
+        </div>
+    </div>
+
+    <!-- Firebase CDN Scripts -->
+    <script type="module">
+        // Import Firebase modules from CDN
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, query, where, updateDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBf-ZFhG8tesNnulOqO_zppcU5wC9pj6MM",
+            authDomain: "city-drive-953c0.firebaseapp.com",
+            projectId: "city-drive-953c0",
+            storageBucket: "city-drive-953c0.firebasestorage.app",
+            messagingSenderId: "83138806155",
+            appId: "1:83138806155:web:e7d967dbeddee9e47daf8e",
+            measurementId: "G-RB3LNG1J3K"
+        };
+
+        // Global variables
+        let app, auth, db, analytics;
+        let currentUser = null;
+        let currentUserRole = null;
+
+        // Initialize Firebase
+        function initializeFirebase() {
+            try {
+                logSystem('🔥 Initializing Firebase...');
+
+                // Initialize Firebase App
+                app = initializeApp(firebaseConfig);
+                logSystem('✅ Firebase App initialized');
+
+                // Initialize Firebase Auth
+                auth = getAuth(app);
+                logSystem('✅ Firebase Auth initialized');
+
+                // Initialize Firestore
+                db = getFirestore(app);
+                logSystem('✅ Firestore initialized');
+
+                // Initialize Analytics
+                analytics = getAnalytics(app);
+                logSystem('✅ Firebase Analytics initialized');
+
+                updateSystemStatus('✅ Firebase initialized successfully!');
+
+                // Set up auth state listener
+                setupAuthListener();
+
+            } catch (error) {
+                console.error('❌ Firebase initialization failed:', error);
+                updateSystemStatus('❌ Firebase initialization failed: ' + error.message);
+                logSystem('Firebase initialization failed: ' + error.message);
+            }
+        }
+
+        // Authentication state listener
+        function setupAuthListener() {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUser = user;
+                    logSystem(`👤 User signed in: ${user.email}`);
+
+                    // Load user role from Firestore
+                    await loadUserRole();
+
+                    // Update UI based on role
+                    updateUIForUser(user, currentUserRole);
+                    showDashboard(currentUserRole);
+
+                } else {
+                    currentUser = null;
+                    currentUserRole = null;
+                    logSystem('👤 User signed out');
+                    showAuthSection();
+                }
+            });
+        }
+
+        // Load user role from Firestore
+        async function loadUserRole() {
+            if (!currentUser) return;
+
+            try {
+                const usersRef = collection(db, 'users');
+                const q = query(usersRef, where('uid', '==', currentUser.uid));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    const userDoc = querySnapshot.docs[0].data();
+                    currentUserRole = userDoc.role || 'customer';
+                } else {
+                    currentUserRole = 'customer';
+                }
+            } catch (error) {
+                console.error('Error loading user role:', error);
+                currentUserRole = 'customer';
+            }
+        }
+
+        // Update UI for authenticated user
+        function updateUIForUser(user, role) {
+            const roleText = role === 'owner' ? 'Car Owner' : 'Customer';
+            const welcomeMsg = `Welcome back, ${user.displayName || user.email}! (${roleText})`;
+
+            if (role === 'owner') {
+                document.getElementById('owner-info').textContent = welcomeMsg;
+                loadOwnerStats();
+            } else {
+                document.getElementById('customer-info').textContent = welcomeMsg;
+                loadCustomerStats();
+            }
+        }
+
+        // Show authentication section
+        function showAuthSection() {
+            document.getElementById('auth-section').style.display = 'block';
+            document.getElementById('owner-dashboard').classList.remove('active');
+            document.getElementById('customer-dashboard').classList.remove('active');
+            updateSystemStatus('Please sign in to continue...');
+        }
+
+        // Show appropriate dashboard
+        function showDashboard(role) {
+            document.getElementById('auth-section').style.display = 'none';
+
+            if (role === 'owner') {
+                document.getElementById('owner-dashboard').classList.add('active');
+                document.getElementById('customer-dashboard').classList.remove('active');
+                loadOwnerData();
+            } else {
+                document.getElementById('customer-dashboard').classList.add('active');
+                document.getElementById('owner-dashboard').classList.remove('active');
+                loadCustomerData();
+            }
+        }
+
+        // Authentication Functions
+        async function signUp() {
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const role = document.querySelector('input[name="signup-role"]:checked').value;
+
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters');
+                return;
+            }
+
+            try {
+                updateSystemStatus('📝 Creating account...');
+                logSystem(`Creating ${role} account for ${email}`);
+
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Create user document in Firestore
+                await createUserDocument(user, role);
+
+                logSystem(`✅ Account created successfully for ${email}`);
+                updateSystemStatus('✅ Account created successfully!');
+
+            } catch (error) {
+                console.error('❌ Sign up failed:', error);
+                alert('Sign up failed: ' + error.message);
+                updateSystemStatus('❌ Sign up failed: ' + error.message);
+                logSystem('Sign up failed: ' + error.message);
+            }
+        }
+
+        async function signIn() {
+            const email = document.getElementById('signin-email').value.trim();
+            const password = document.getElementById('signin-password').value;
+
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            try {
+                updateSystemStatus('🔑 Signing in...');
+                logSystem(`Signing in ${email}`);
+
+                await signInWithEmailAndPassword(auth, email, password);
+
+                logSystem(`✅ Signed in successfully`);
+                updateSystemStatus('✅ Signed in successfully!');
+
+            } catch (error) {
+                console.error('❌ Sign in failed:', error);
+                alert('Sign in failed: ' + error.message);
+                updateSystemStatus('❌ Sign in failed: ' + error.message);
+                logSystem('Sign in failed: ' + error.message);
+            }
+        }
+
+        async function signOut() {
+            try {
+                updateSystemStatus('🚪 Signing out...');
+                await firebaseSignOut(auth);
+                updateSystemStatus('✅ Signed out successfully!');
+                logSystem('User signed out');
+            } catch (error) {
+                console.error('❌ Sign out failed:', error);
+                alert('Sign out failed: ' + error.message);
+                logSystem('Sign out failed: ' + error.message);
+            }
+        }
+
+        // Firestore Functions
+        async function createUserDocument(user, role) {
+            try {
+                const userDoc = {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName || user.email.split('@')[0],
+                    role: role,
+                    createdAt: new Date(),
+                    profileComplete: false
+                };
+
+                await addDoc(collection(db, 'users'), userDoc);
+                logSystem(`✅ User document created for ${user.email} (${role})`);
+
+            } catch (error) {
+                console.error('❌ Failed to create user document:', error);
+                logSystem('Failed to create user document: ' + error.message);
+            }
+        }
+
+        // Owner Functions
+        async function addCar() {
+            if (!currentUser || currentUserRole !== 'owner') {
+                alert('Only car owners can add cars');
+                return;
+            }
+
+            const name = document.getElementById('car-name').value.trim();
+            const model = document.getElementById('car-model').value.trim();
+            const price = parseFloat(document.getElementById('car-price').value);
+            const location = document.getElementById('car-location').value.trim();
+
+            if (!name || !model || !price || !location) {
+                alert('Please fill in all car details');
+                return;
+            }
+
+            try {
+                updateSystemStatus('🚗 Adding car...');
+                logSystem(`Adding car: ${name} ${model}`);
+
+                const carDoc = {
+                    name: name,
+                    model: model,
+                    pricePerDay: price,
+                    location: location,
+                    ownerId: currentUser.uid,
+                    available: true,
+                    category: 'SUV',
+                    fuelType: 'Gasoline',
+                    transmission: 'Automatic',
+                    seatingCapacity: 5,
+                    description: `Beautiful ${name} ${model} available for rent`,
+                    features: ['Air Conditioning', 'GPS', 'Bluetooth'],
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+
+                await addDoc(collection(db, 'cars'), carDoc);
+
+                // Clear form
+                document.getElementById('car-name').value = '';
+                document.getElementById('car-model').value = '';
+                document.getElementById('car-price').value = '';
+                document.getElementById('car-location').value = '';
+
+                logSystem(`✅ Car added: ${name} ${model}`);
+                updateSystemStatus('✅ Car added successfully!');
+
+                // Refresh data
+                loadOwnerCars();
+                loadOwnerStats();
+
+            } catch (error) {
+                console.error('❌ Failed to add car:', error);
+                alert('Failed to add car: ' + error.message);
+                logSystem('Failed to add car: ' + error.message);
+            }
+        }
+
+        async function loadOwnerCars() {
+            if (!currentUser || currentUserRole !== 'owner') return;
+
+            try {
+                updateSystemStatus('📋 Loading your cars...');
+
+                const carsRef = collection(db, 'cars');
+                const q = query(carsRef, where('ownerId', '==', currentUser.uid));
+                const querySnapshot = await getDocs(q);
+
+                const cars = [];
+                querySnapshot.forEach((doc) => {
+                    cars.push({ id: doc.id, ...doc.data() });
+                });
+
+                displayCars(cars, 'owner-cars-list');
+                logSystem(`✅ Loaded ${cars.length} cars`);
+
+            } catch (error) {
+                console.error('❌ Failed to load cars:', error);
+                document.getElementById('owner-cars-list').textContent = 'Error loading cars: ' + error.message;
+                logSystem('Failed to load cars: ' + error.message);
+            }
+        }
+
+        async function loadAllBookings() {
+            if (!currentUser || currentUserRole !== 'owner') return;
+
+            try {
+                updateSystemStatus('📋 Loading all bookings...');
+
+                const querySnapshot = await getDocs(collection(db, 'bookings'));
+                const bookings = [];
+
+                querySnapshot.forEach((doc) => {
+                    bookings.push({ id: doc.id, ...doc.data() });
+                });
+
+                displayBookings(bookings, 'owner-bookings-list');
+                logSystem(`✅ Loaded ${bookings.length} bookings`);
+
+            } catch (error) {
+                console.error('❌ Failed to load bookings:', error);
+                document.getElementById('owner-bookings-list').textContent = 'Error loading bookings: ' + error.message;
+                logSystem('Failed to load bookings: ' + error.message);
+            }
+        }
+
+        async function loadOwnerStats() {
+            if (!currentUser || currentUserRole !== 'owner') return;
+
+            try {
+                // Load cars count
+                const carsRef = collection(db, 'cars');
+                const carsQuery = query(carsRef, where('ownerId', '==', currentUser.uid));
+                const carsSnapshot = await getDocs(carsQuery);
+                document.getElementById('total-cars').textContent = carsSnapshot.size;
+
+                // Load bookings count and revenue
+                const bookingsRef = collection(db, 'bookings');
+                const bookingsSnapshot = await getDocs(bookingsRef);
+
+                let totalBookings = 0;
+                let totalRevenue = 0;
+                let pendingBookings = 0;
+
+                bookingsSnapshot.forEach((doc) => {
+                    const booking = doc.data();
+                    totalBookings++;
+                    totalRevenue += booking.totalPrice || 0;
+                    if (booking.status === 'pending') pendingBookings++;
+                });
+
+                document.getElementById('total-bookings').textContent = totalBookings;
+                document.getElementById('total-revenue').textContent = `$${totalRevenue}`;
+                document.getElementById('pending-bookings').textContent = pendingBookings;
+
+            } catch (error) {
+                console.error('❌ Failed to load stats:', error);
+                logSystem('Failed to load owner stats: ' + error.message);
+            }
+        }
+
+        // Customer Functions
+        async function loadAvailableCars() {
+            try {
+                updateSystemStatus('🚗 Loading available cars...');
+
+                const carsRef = collection(db, 'cars');
+                const q = query(carsRef, where('available', '==', true));
+                const querySnapshot = await getDocs(q);
+
+                const cars = [];
+                querySnapshot.forEach((doc) => {
+                    cars.push({ id: doc.id, ...doc.data() });
+                });
+
+                displayCars(cars, 'available-cars-list');
+                logSystem(`✅ Loaded ${cars.length} available cars`);
+
+            } catch (error) {
+                console.error('❌ Failed to load cars:', error);
+                document.getElementById('available-cars-list').textContent = 'Error loading cars: ' + error.message;
+                logSystem('Failed to load cars: ' + error.message);
+            }
+        }
+
+        async function createBooking() {
+            if (!currentUser) {
+                alert('Please sign in to book a car');
+                return;
+            }
+
+            const carId = document.getElementById('book-car-id').value.trim();
+            const startDate = new Date(document.getElementById('book-start-date').value);
+            const endDate = new Date(document.getElementById('book-end-date').value);
+
+            if (!carId || !startDate || !endDate) {
+                alert('Please fill in all booking details');
+                return;
+            }
+
+            if (startDate >= endDate) {
+                alert('End date must be after start date');
+                return;
+            }
+
+            try {
+                updateSystemStatus('📅 Creating booking...');
+                logSystem(`Creating booking for car ${carId}`);
+
+                // Get car details
+                const carDoc = await getDoc(doc(db, 'cars', carId));
+                if (!carDoc.exists()) {
+                    alert('Car not found');
+                    return;
+                }
+
+                const carData = carDoc.data();
+                const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                const totalPrice = days * carData.pricePerDay;
+
+                const bookingDoc = {
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    carId: carId,
+                    carName: `${carData.name} ${carData.model}`,
+                    carPricePerDay: carData.pricePerDay,
+                    startDate: startDate,
+                    endDate: endDate,
+                    totalDays: days,
+                    totalPrice: totalPrice,
+                    status: 'pending',
+                    createdAt: new Date()
+                };
+
+                await addDoc(collection(db, 'bookings'), bookingDoc);
+
+                // Clear form
+                document.getElementById('book-car-id').value = '';
+                document.getElementById('book-start-date').value = '';
+                document.getElementById('book-end-date').value = '';
+
+                logSystem(`✅ Booking created: ${bookingDoc.carName} for $${totalPrice}`);
+                updateSystemStatus(`✅ Booking created successfully! Total: $${totalPrice}`);
+
+                // Refresh data
+                loadMyBookings();
+                loadCustomerStats();
+
+            } catch (error) {
+                console.error('❌ Failed to create booking:', error);
+                alert('Failed to create booking: ' + error.message);
+                logSystem('Failed to create booking: ' + error.message);
+            }
+        }
+
+        async function loadMyBookings() {
+            if (!currentUser) return;
+
+            try {
+                updateSystemStatus('📋 Loading your bookings...');
+
+                const bookingsRef = collection(db, 'bookings');
+                const q = query(bookingsRef, where('userId', '==', currentUser.uid));
+                const querySnapshot = await getDocs(q);
+
+                const bookings = [];
+                querySnapshot.forEach((doc) => {
+                    bookings.push({ id: doc.id, ...doc.data() });
+                });
+
+                displayBookings(bookings, 'my-bookings-list');
+                logSystem(`✅ Loaded ${bookings.length} bookings`);
+
+            } catch (error) {
+                console.error('❌ Failed to load bookings:', error);
+                document.getElementById('my-bookings-list').textContent = 'Error loading bookings: ' + error.message;
+                logSystem('Failed to load bookings: ' + error.message);
+            }
+        }
+
+        async function loadCustomerStats() {
+            if (!currentUser) return;
+
+            try {
+                const bookingsRef = collection(db, 'bookings');
+                const q = query(bookingsRef, where('userId', '==', currentUser.uid));
+                const querySnapshot = await getDocs(q);
+
+                let totalBookings = 0;
+                let totalSpent = 0;
+                let activeBookings = 0;
+                let completedBookings = 0;
+
+                querySnapshot.forEach((doc) => {
+                    const booking = doc.data();
+                    totalBookings++;
+                    totalSpent += booking.totalPrice || 0;
+
+                    if (booking.status === 'confirmed' || booking.status === 'pending') {
+                        activeBookings++;
+                    } else if (booking.status === 'completed') {
+                        completedBookings++;
+                    }
+                });
+
+                document.getElementById('my-bookings-count').textContent = totalBookings;
+                document.getElementById('total-spent').textContent = `$${totalSpent}`;
+                document.getElementById('active-bookings').textContent = activeBookings;
+                document.getElementById('completed-bookings').textContent = completedBookings;
+
+            } catch (error) {
+                console.error('❌ Failed to load customer stats:', error);
+                logSystem('Failed to load customer stats: ' + error.message);
+            }
+        }
+
+        // Data Display Functions
+        function displayCars(cars, elementId) {
+            const element = document.getElementById(elementId);
+
+            if (cars.length === 0) {
+                element.textContent = 'No cars found';
+                return;
+            }
+
+            const carsText = cars.map(car => `🚗 ${car.name} ${car.model}
+💰 $${car.pricePerDay}/day
+📍 ${car.location}
+🏷️ ${car.available ? 'Available' : 'Not Available'}
+📅 Created: ${car.createdAt?.toDate?.()?.toLocaleDateString() || 'N/A'}
+🆔 ${car.id}
+
+`).join('');
+
+            element.textContent = carsText;
+        }
+
+        function displayBookings(bookings, elementId) {
+            const element = document.getElementById(elementId);
+
+            if (bookings.length === 0) {
+                element.textContent = 'No bookings found';
+                return;
+            }
+
+            const bookingsText = bookings.map(booking => `🚗 ${booking.carName}
+📅 ${booking.startDate?.toDate?.()?.toLocaleDateString() || 'N/A'} - ${booking.endDate?.toDate?.()?.toLocaleDateString() || 'N/A'}
+💰 $${booking.totalPrice} (${booking.totalDays} days)
+🏷️ Status: ${booking.status}
+📝 Created: ${booking.createdAt?.toDate?.()?.toLocaleDateString() || 'N/A'}
+🆔 ${booking.id}
+
+`).join('');
+
+            element.textContent = bookingsText;
+        }
+
+        // Load initial data for dashboards
+        function loadOwnerData() {
+            loadOwnerCars();
+            loadAllBookings();
+            loadOwnerStats();
+        }
+
+        function loadCustomerData() {
+            loadAvailableCars();
+            loadMyBookings();
+            loadCustomerStats();
+        }
+
+        // UI Helper Functions
+        function updateSystemStatus(message) {
+            const statusEl = document.getElementById('system-status');
+            statusEl.textContent = message;
+            statusEl.className = 'status ' +
+                (message.includes('✅') ? 'success' :
+                 message.includes('❌') ? 'error' : 'info');
+        }
+
+        function logSystem(message) {
+            const logsEl = document.getElementById('system-logs');
+            const timestamp = new Date().toLocaleTimeString();
+            logsEl.textContent += `[${timestamp}] ${message}\n`;
+            logsEl.scrollTop = logsEl.scrollHeight;
+            console.log(message);
+        }
+
+        // Make functions globally available
+        window.signUp = signUp;
+        window.signIn = signIn;
+        window.signOut = signOut;
+        window.addCar = addCar;
+        window.loadOwnerCars = loadOwnerCars;
+        window.loadAllBookings = loadAllBookings;
+        window.loadAvailableCars = loadAvailableCars;
+        window.createBooking = createBooking;
+        window.loadMyBookings = loadMyBookings;
+
+        // Initialize the app when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            logSystem('🎯 City Drive App Starting...');
+            initializeFirebase();
+        });
+
+        logSystem('🚀 City Drive App Loaded Successfully!');
+    </script>
+</body>
+</html>

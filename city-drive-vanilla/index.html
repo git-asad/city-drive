@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Drive - Complete Car Rental App</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Firebase CDN Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
+        import {
+            getAuth,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            signOut as firebaseSignOut,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            getDocs,
+            doc,
+            setDoc,
+            getDoc,
+            query,
+            where,
+            updateDoc,
+            deleteDoc
+        } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+        window.firebaseModules = {
+            initializeApp,
+            getAnalytics,
+            getAuth,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            firebaseSignOut,
+            onAuthStateChanged,
+            getFirestore,
+            collection,
+            addDoc,
+            getDocs,
+            doc,
+            setDoc,
+            getDoc,
+            query,
+            where,
+            updateDoc,
+            deleteDoc
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 City Drive - Complete Car Rental App</h1>
+            <p>Full-featured Firebase-powered car rental system</p>
+        </div>
+
+        <div class="content">
+            <!-- Firebase Status -->
+            <div class="section">
+                <h2>🔥 Firebase Status</h2>
+                <div id="firebase-status" class="status info">Initializing Firebase...</div>
+            </div>
+
+            <!-- Authentication Section -->
+            <div class="section">
+                <h2>🔐 Authentication</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Sign Up</h3>
+                        <div class="role-selector">
+                            <label><input type="radio" name="signup-role" value="customer" checked> Customer</label>
+                            <label><input type="radio" name="signup-role" value="owner"> Car Owner</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-email">Email:</label>
+                            <input type="email" id="signup-email" placeholder="user@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-password">Password:</label>
+                            <input type="password" id="signup-password" placeholder="Min 6 characters">
+                        </div>
+                        <button class="btn" onclick="signUp()">Sign Up</button>
+                    </div>
+
+                    <div class="card">
+                        <h3>Sign In</h3>
+                        <div class="form-group">
+                            <label for="signin-email">Email:</label>
+                            <input type="email" id="signin-email" placeholder="user@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="signin-password">Password:</label>
+                            <input type="password" id="signin-password" placeholder="Your password">
+                        </div>
+                        <button class="btn" onclick="signIn()">Sign In</button>
+                    </div>
+
+                    <div class="card">
+                        <h3>User Status</h3>
+                        <div id="user-status" class="status info">Not signed in</div>
+                        <button class="btn btn-danger" onclick="signOut()">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Dashboard -->
+            <div id="customer-dashboard" class="dashboard-section">
+                <div class="section">
+                    <h2>👤 Customer Dashboard</h2>
+                    <div class="grid">
+                        <div class="card">
+                            <h3>Browse Cars</h3>
+                            <button class="btn" onclick="getAllCars()">Load Available Cars</button>
+                            <div id="customer-cars-list" class="data-display">Available cars will appear here...</div>
+                        </div>
+
+                        <div class="card">
+                            <h3>Book a Car</h3>
+                            <div class="form-group">
+                                <label for="book-car-id">Car ID:</label>
+                                <input type="text" id="book-car-id" placeholder="Enter car ID from list">
+                            </div>
+                            <div class="form-group">
+                                <label for="book-start-date">Start Date:</label>
+                                <input type="date" id="book-start-date">
+                            </div>
+                            <div class="form-group">
+                                <label for="book-end-date">End Date:</label>
+                                <input type="date" id="book-end-date">
+                            </div>
+                            <button class="btn" onclick="createBooking()">Book Car</button>
+                        </div>
+
+                        <div class="card">
+                            <h3>My Bookings</h3>
+                            <button class="btn btn-secondary" onclick="getUserBookings()">Load My Bookings</button>
+                            <div id="customer-bookings-list" class="data-display">Your bookings will appear here...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Owner Dashboard -->
+            <div id="owner-dashboard" class="dashboard-section">
+                <div class="section">
+                    <h2>🏢 Owner Dashboard</h2>
+                    <div class="grid">
+                        <div class="card">
+                            <h3>Add New Car</h3>
+                            <div class="form-group">
+                                <label for="car-name">Car Name:</label>
+                                <input type="text" id="car-name" placeholder="BMW X5">
+                            </div>
+                            <div class="form-group">
+                                <label for="car-model">Model:</label>
+                                <input type="text" id="car-model" placeholder="2023">
+                            </div>
+                            <div class="form-group">
+                                <label for="car-price">Daily Price ($):</label>
+                                <input type="number" id="car-price" placeholder="150">
+                            </div>
+                            <div class="form-group">
+                                <label for="car-location">Location:</label>
+                                <input type="text" id="car-location" placeholder="Downtown">
+                            </div>
+                            <button class="btn" onclick="addSampleCar()">Add Car</button>
+                        </div>
+
+                        <div class="card">
+                            <h3>My Cars</h3>
+                            <button class="btn btn-secondary" onclick="getOwnerCars()">Load My Cars</button>
+                            <div id="owner-cars-list" class="data-display">Your cars will appear here...</div>
+                        </div>
+
+                        <div class="card">
+                            <h3>Manage Bookings</h3>
+                            <button class="btn btn-secondary" onclick="getAllBookings()">Load All Bookings</button>
+                            <div id="owner-bookings-list" class="data-display">All bookings will appear here...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collections Preview -->
+            <div class="section">
+                <h2>📁 Collections Structure</h2>
+                <div class="data-display">
+Collections Structure:
+├── users/           # User profiles and preferences
+│   ├── uid: string
+│   ├── email: string
+│   ├── role: 'customer' | 'owner'
+│   └── createdAt: timestamp
+├── cars/            # Car inventory and details
+│   ├── name: string
+│   ├── model: string
+│   ├── pricePerDay: number
+│   ├── ownerId: string
+│   └── available: boolean
+├── bookings/        # Rental bookings and reservations
+│   ├── userId: string
+│   ├── carId: string
+│   ├── startDate: timestamp
+│   ├── endDate: timestamp
+│   ├── totalPrice: number
+│   └── status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
+├── reviews/         # User reviews and ratings (TODO: Implement)
+└── payments/        # Payment records and transactions (TODO: Implement)
+                </div>
+            </div>
+
+            <!-- Console Output -->
+            <div class="section">
+                <h2>📝 Console Output</h2>
+                <div id="console-output" class="data-display">Firebase operations will be logged here...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

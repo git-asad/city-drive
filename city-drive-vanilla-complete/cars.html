@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Cars - City Drive</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Modern color scheme variables */
+        :root {
+            --modern-indigo: #6366f1;
+            --modern-purple: #8b5cf6;
+            --modern-cyan: #06b6d4;
+            --modern-white: #ffffff;
+            --modern-gray: #f8fafc;
+            --modern-dark: #1e293b;
+            --modern-light: #f1f5f9;
+        }
+
+        /* Cars Page Styles */
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            min-height: 100vh;
+        }
+
+        .cars-hero {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+            color: white;
+            padding: 80px 0 60px;
+            text-align: center;
+        }
+
+        .cars-hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .cars-hero p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .cars-main {
+            max-width: 1400px;
+            margin: -40px auto 80px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Enhanced Car Search & Filter */
+        .car-search-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+            margin-bottom: 50px;
+        }
+
+        .search-filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-group label::before {
+            content: "🔍";
+            font-size: 1rem;
+        }
+
+        .filter-select,
+        .filter-input {
+            padding: 16px 18px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+            font-family: inherit;
+        }
+
+        .filter-select:focus,
+        .filter-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4);
+        }
+
+        /* Cars Grid */
+        .cars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        /* Enhanced Car Card Styles */
+        .car-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 1;
+            transform: scale(1);
+            position: relative;
+        }
+
+        .car-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .car-card.hidden {
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+        }
+
+        .car-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .car-card:hover .car-image {
+            transform: scale(1.1);
+        }
+
+        .car-info {
+            padding: 25px;
+        }
+
+        .car-info h3 {
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .car-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .car-details span {
+            background: #f1f5f9;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #475569;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .car-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #6366f1;
+        }
+
+        .btn-book {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            width: 100%;
+        }
+
+        .btn-book:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Results Counter */
+        .results-counter {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .results-counter strong {
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        /* Luxury Loading Screen */
+        .luxury-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        }
+
+        .luxury-loader.loaded {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loader-logo {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #6366f1, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: logoGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoGlow {
+            0% {
+                filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.5));
+            }
+            100% {
+                filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.8));
+            }
+        }
+
+        .loader-text {
+            font-size: 18px;
+            opacity: 0.8;
+            animation: textPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes textPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .cars-hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .cars-hero p {
+                font-size: 1.1rem;
+            }
+
+            .cars-main {
+                margin: -20px auto 60px;
+                padding: 0 15px;
+            }
+
+            .car-search-container {
+                padding: 25px;
+                margin-bottom: 30px;
+            }
+
+            .search-filters {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .cars-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+
+            .car-card {
+                margin-bottom: 0;
+            }
+
+            .car-info {
+                padding: 20px;
+            }
+
+            .car-info h3 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Luxury Loading Screen -->
+    <div id="luxury-loader" class="luxury-loader">
+        <div class="loader-content">
+            <div class="loader-logo">City Drive</div>
+            <div class="loader-text">Loading Premium Fleet</div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html">
+                    <img src="assets/logo.svg" alt="City Drive" onclick="window.location.href='index.html'">
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="cars.html" class="nav-link active">Cars</a>
+                <a href="my-bookings.html" class="nav-link">My Bookings</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+                <a href="#about" class="nav-link">About</a>
+            </div>
+            <div class="nav-auth">
+                <button onclick="showLoginModal()" class="btn-secondary">Login</button>
+                <button onclick="showSignupModal()" class="btn-primary">Sign Up</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cars Hero -->
+    <section class="cars-hero">
+        <div class="container">
+            <h1>Our Premium Fleet</h1>
+            <p>Discover our collection of luxury vehicles. From elegant sedans to powerful SUVs, find your perfect ride.</p>
+        </div>
+    </section>
+
+    <!-- Cars Main Content -->
+    <div class="cars-main">
+        <!-- Car Search & Filter -->
+        <div class="car-search-container">
+            <div class="search-filters">
+                <div class="filter-group">
+                    <label for="car-type-filter">Car Type</label>
+                    <select id="car-type-filter" class="filter-select">
+                        <option value="">All Types</option>
+                        <option value="SUV">SUV</option>
+                        <option value="Sedan">Sedan</option>
+                        <option value="Luxury">Luxury</option>
+                        <option value="Sports">Sports</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="price-range-filter">Price Range</label>
+                    <select id="price-range-filter" class="filter-select">
+                        <option value="">All Prices</option>
+                        <option value="0-150">$0 - $150/day</option>
+                        <option value="150-250">$150 - $250/day</option>
+                        <option value="250-400">$250 - $400/day</option>
+                        <option value="400+">$400+/day</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="availability-filter">Available From</label>
+                    <input type="date" id="availability-filter" class="filter-input">
+                </div>
+                <div class="filter-group">
+                    <label for="search-input">Search Cars</label>
+                    <input type="text" id="search-input" class="filter-input" placeholder="Search by brand, model...">
+                </div>
+                <div class="filter-group">
+                    <button id="clear-filters" class="btn-secondary">Clear Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Counter -->
+        <div class="results-counter">
+            <span id="results-text">Showing <strong id="results-count">6</strong> of <strong>6</strong> cars</span>
+        </div>
+
+        <!-- Cars Grid -->
+        <div class="cars-grid" id="cars-grid">
+            <div class="car-card" data-type="SUV" data-price="300" data-brand="BMW" data-model="X5">
+                <img src="assets/car_image1.png" alt="BMW X5" class="car-image">
+                <div class="car-info">
+                    <h3>BMW X5</h3>
+                    <div class="car-details">
+                        <span>🚗 SUV</span>
+                        <span>⛽ Hybrid</span>
+                        <span>👥 4 seats</span>
+                        <span>📍 New York</span>
+                    </div>
+                    <div class="car-price">
+                        <span class="price">$300/day</span>
+                    </div>
+                    <button class="btn-book" onclick="bookCar('BMW X5', 300)">Book Now</button>
+                </div>
+            </div>
+
+            <div class="car-card" data-type="Sedan" data-price="130" data-brand="Toyota" data-model="Corolla">
+                <img src="assets/car_image2.png" alt="Toyota Corolla" class="car-image">
+                <div class="car-info">
+                    <h3>Toyota Corolla</h3>
+                    <div class="car-details">
+                        <span>🚗 Sedan</span>
+                        <span>⛽ Diesel</span>
+                        <span>👥 4 seats</span>
+                        <span>📍 Chicago</span>
+                    </div>
+                    <div class="car-price">
+                        <span class="price">$130/day</span>
+                    </div>
+                    <button class="btn-book" onclick="bookCar('Toyota Corolla', 130)">Book Now</button>
+                </div>
+            </div>
+
+            <div class="car-card" data-type="SUV" data-price="200" data-brand="Jeep" data-model="Wrangler">
+                <img src="assets/car_image3.png" alt="Jeep Wrangler" class="car-image">
+                <div class="car-info">
+                    <h3>Jeep Wrangler</h3>
+                    <div class="car-details">
+                        <span>🚗 SUV</span>
+                        <span>⛽ Hybrid</span>
+                        <span>👥 4 seats</span>
+                        <span>📍 Los Angeles</span>
+                    </div>
+                    <div class="car-price">
+                        <span class="price">$200/day</span>
+                    </div>
+                    <button class="btn-book" onclick="bookCar('Jeep Wrangler', 200)">Book Now</button>
+                </div>
+            </div>
+
+            <div class="car-card" data-type="Sedan" data-price="209" data-brand="Ford" data-model="Neo 6">
+                <img src="assets/car_image4.png" alt="Ford Neo 6" class="car-image">
+                <div class="car-info">
+                    <h3>Ford Neo 6</h3>
+                    <div class="car-details">
+                        <span>🚗 Sedan</span>
+                        <span>⛽ Diesel</span>
+                        <span>👥 2 seats</span>
+                        <span>📍 Houston</span>
+                    </div>
+                    <div class="car-price">
+                        <span class="price">$209/day</span>
+                    </div>
+                    <button class="btn-book" onclick="bookCar('Ford Neo 6', 209)">Book Now</button>
+                </div>
+            </div>
+
+            <!-- Additional Cars for Better Selection -->
+            <div class="car-card" data-type="Luxury" data-price="450" data-brand="Mercedes" data-model="S-Class">
+                <img src="assets/main_car.png" alt="Mercedes S-Class" class="car-image">
+                <div class="car-info">
+                    <h3>Mercedes S-Class</h3>
+                    <div class="car-details">
+                        <span>🚗 Luxury</span>
+                        <span>⛽ Gasoline</span>
+                        <span>👥 5 seats</span>
+                        <span>📍 Miami</span>
+                    </div>
+                    <div class="car-price">
+                        <span class="price">$450/day</span>
+                    </div>
+                    <button class="btn-book" onclick="bookCar('Mercedes S-Class', 450)">Book Now</button>
+                </div>
+            </div>
+
+            <div class="car-card" data-type="Sports" data-price="380" data-brand="Porsche" data-model="911">
+                <img src="assets/bmw_new.png" alt="Porsche 911" class="car-image">
+                <div class="car-info">
+                    <h3>Porsche 911</h3>
+                    <div class="car-details">
+                        <span>🚗 Sports</span>
+                        <span>⛽ Gasoline</span>
+                        <span>👥 2 seats</span>
+                        <span>📍 Seattle</span>
+                    </div>
+                    <div class="car-price">
+                        <span class="price">$380/day</span>
+                    </div>
+                    <button class="btn-book" onclick="bookCar('Porsche 911', 380)">Book Now</button>
+                </div>
+            </div>
+
+            <div class="car-card" data-type="SUV" data-price="350" data-brand="BMW" data-model="X5">
+                <img src="assets/bmw_new.png" alt="BMW X5" class="car-image">
+                <div class="car-info">
+                    <h3>BMW X5</h3>
+                    <div class="car-details">
+                        <span>🚗 SUV</span>
+                        <span>⛽ Gasoline</span>
+                        <span>👥 5 seats</span>
+                        <span>📍 Miami</span>
+                    </div>
+                    <div class="car-price">
+                        <span class="price">$350/day</span>
+                    </div>
+                    <button class="btn-book" onclick="bookCar('BMW X5', 350)">Book Now</button>
+                </div>
+            </div>
+
+            <div class="car-card" data-type="Luxury" data-price="320" data-brand="Audi" data-model="A8">
+                <img src="assets/main_car.png" alt="Audi A8" class="car-image">
+                <div class="car-info">
+                    <h3>Audi A8</h3>
+                    <div class="car-details">
+                        <span>🚗 Luxury</span>
+                        <span>⛽ Diesel</span>
+                        <span>👥 5 seats</span>
+                        <span>📍 Boston</span>
+                    </div>
+                    <div class="car-price">
+                        <span class="price">$320/day</span>
+                    </div>
+                    <button class="btn-book" onclick="bookCar('Audi A8', 320)">Book Now</button>
+                </div>
+            </div>
+
+            <div class="car-card" data-type="Sedan" data-price="180" data-brand="Honda" data-model="Accord">
+                <img src="assets/car_image2.png" alt="Honda Accord" class="car-image">
+                <div class="car-info">
+                    <h3>Honda Accord</h3>
+                    <div class="car-details">
+                        <span>🚗 Sedan</span>
+                        <span>⛽ Hybrid</span>
+                        <span>👥 5 seats</span>
+                        <span>📍 Denver</span>
+                    </div>
+                    <div class="car-price">
+                        <span class="price">$180/day</span>
+                    </div>
+                    <button class="btn-book" onclick="bookCar('Honda Accord', 180)">Book Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>City Drive</h3>
+                <p>Your trusted car rental platform for luxury vehicles</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">📘</a>
+                    <a href="#" class="social-link">🐦</a>
+                    <a href="#" class="social-link">📷</a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="cars.html">Cars</a></li>
+                    <li><a href="my-bookings.html">My Bookings</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="#about">About</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Services</h4>
+                <ul>
+                    <li><a href="#">Car Rental</a></li>
+                    <li><a href="#">Luxury Fleet</a></li>
+                    <li><a href="#">Airport Transfer</a></li>
+                    <li><a href="#">Chauffeur Service</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2024 City Drive. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Cars Page Specific JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loading overlay
+            setTimeout(() => {
+                document.getElementById('luxury-loader').classList.add('loaded');
+            }, 1000);
+
+            // Initialize car search and filtering
+            initializeCarSearch();
+
+            // Update results counter initially
+            updateResultsCounter();
+        });
+
+        // Enhanced Car Search and Filter Functionality
+        let allCars = [];
+        let filteredCars = [];
+
+        function initializeCarSearch() {
+            // Get all car cards
+            allCars = Array.from(document.querySelectorAll('.car-card'));
+            filteredCars = [...allCars];
+
+            // Set up event listeners for filters
+            document.getElementById('car-type-filter').addEventListener('change', applyFilters);
+            document.getElementById('price-range-filter').addEventListener('change', applyFilters);
+            document.getElementById('availability-filter').addEventListener('change', applyFilters);
+            document.getElementById('search-input').addEventListener('input', applyFilters);
+            document.getElementById('clear-filters').addEventListener('click', clearFilters);
+
+            // Set minimum date for availability filter
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('availability-filter').min = today;
+        }
+
+        function applyFilters() {
+            const carType = document.getElementById('car-type-filter').value.toLowerCase();
+            const priceRange = document.getElementById('price-range-filter').value;
+            const availabilityDate = document.getElementById('availability-filter').value;
+            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+
+            filteredCars = allCars.filter(car => {
+                // Car type filter
+                if (carType && car.dataset.type.toLowerCase() !== carType) {
+                    return false;
+                }
+
+                // Price range filter
+                if (priceRange) {
+                    const carPrice = parseInt(car.dataset.price);
+                    const [min, max] = priceRange.split('-').map(p => p === '+' ? Infinity : parseInt(p));
+                    if (carPrice < min || (max !== Infinity && carPrice > max)) {
+                        return false;
+                    }
+                }
+
+                // Availability filter (simplified - in real app would check actual availability)
+                if (availabilityDate) {
+                    // For demo purposes, assume all cars are available
+                    // In real app, this would check against booking data
+                }
+
+                // Search filter
+                if (searchTerm) {
+                    const brand = car.dataset.brand.toLowerCase();
+                    const model = car.dataset.model.toLowerCase();
+                    const type = car.dataset.type.toLowerCase();
+                    const searchText = `${brand} ${model} ${type}`;
+
+                    if (!searchText.includes(searchTerm)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            // Update display
+            updateCarDisplay();
+            updateResultsCounter();
+        }
+
+        function updateCarDisplay() {
+            allCars.forEach(car => {
+                if (filteredCars.includes(car)) {
+                    car.classList.remove('hidden');
+                    setTimeout(() => {
+                        car.style.opacity = '1';
+                        car.style.transform = 'scale(1)';
+                    }, 10);
+                } else {
+                    car.classList.add('hidden');
+                    car.style.opacity = '0';
+                    car.style.transform = 'scale(0.8)';
+                }
+            });
+        }
+
+        function updateResultsCounter() {
+            const resultsCount = filteredCars.length;
+            const totalCount = allCars.length;
+
+            const resultsText = document.getElementById('results-text');
+            const resultsCountEl = document.getElementById('results-count');
+
+            if (resultsText && resultsCountEl) {
+                resultsCountEl.textContent = resultsCount;
+                resultsText.innerHTML = `Showing <strong>${resultsCount}</strong> of <strong>${totalCount}</strong> cars`;
+            }
+        }
+
+        function clearFilters() {
+            document.getElementById('car-type-filter').value = '';
+            document.getElementById('price-range-filter').value = '';
+            document.getElementById('availability-filter').value = '';
+            document.getElementById('search-input').value = '';
+
+            filteredCars = [...allCars];
+            updateCarDisplay();
+            updateResultsCounter();
+        }
+
+        // Modified bookCar function for cars page
+        function bookCar(carName, price) {
+            // Scroll to top of page to show booking form (which is on home page)
+            window.location.href = 'index.html#booking-form';
+        }
+
+        // Navigation functions
+        function showLoginModal() {
+            window.location.href = 'login.html';
+        }
+
+        function showSignupModal() {
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

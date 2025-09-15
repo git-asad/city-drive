@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Drive - Owner Dashboard</title>
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-info">
+                    <img src="../assets/user_profile.png" alt="Profile" class="user-avatar">
+                    <div>
+                        <h3 id="owner-name">Owner Name</h3>
+                        <p id="owner-email">owner@example.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <button onclick="navigateTo('dashboard')" class="nav-item active" id="nav-dashboard">
+                            <img src="../assets/dashboardIconColored.svg" alt="Dashboard" class="nav-icon">
+                            Dashboard
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="navigateTo('add-car')" class="nav-item" id="nav-add-car">
+                            <img src="../assets/addIconColored.svg" alt="Add Car" class="nav-icon">
+                            Add car
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="navigateTo('manage-cars')" class="nav-item" id="nav-manage-cars">
+                            <img src="../assets/carIconColored.svg" alt="Manage Cars" class="nav-icon">
+                            Manage Cars
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="navigateTo('manage-bookings')" class="nav-item" id="nav-manage-bookings">
+                            <img src="../assets/listIconColored.svg" alt="Manage Bookings" class="nav-icon">
+                            Manage Bookings
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Content -->
+            <div id="dashboard-content" class="content-section active">
+                <div class="content-header">
+                    <h1>Dashboard</h1>
+                    <p>Welcome back! Here's what's happening with your cars.</p>
+                </div>
+
+                <!-- Monthly Revenue -->
+                <div class="revenue-card">
+                    <div class="revenue-content">
+                        <div>
+                            <h2>Monthly Revenue</h2>
+                            <p>Current month earnings</p>
+                        </div>
+                        <div class="revenue-amount">
+                            <div id="monthly-revenue">$0.00</div>
+                            <div class="revenue-change">+12% from last month</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-blue">
+                            <img src="../assets/carIcon.svg" alt="Cars">
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-title">Total Cars</p>
+                            <p class="stat-value" id="total-cars">0</p>
+                        </div>
+                        <div class="stat-indicator blue"></div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon bg-green">
+                            <img src="../assets/listIcon.svg" alt="Bookings">
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-title">Total Bookings</p>
+                            <p class="stat-value" id="total-bookings">0</p>
+                        </div>
+                        <div class="stat-indicator green"></div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon bg-yellow">
+                            <img src="../assets/calendar_icon_colored.svg" alt="Pending">
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-title">Pending Bookings</p>
+                            <p class="stat-value" id="pending-bookings">0</p>
+                        </div>
+                        <div class="stat-indicator yellow"></div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon bg-purple">
+                            <img src="../assets/check_icon.svg" alt="Confirmed">
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-title">Confirmed Bookings</p>
+                            <p class="stat-value" id="confirmed-bookings">0</p>
+                        </div>
+                        <div class="stat-indicator purple"></div>
+                    </div>
+                </div>
+
+                <!-- Recent Bookings -->
+                <div class="recent-bookings">
+                    <div class="section-header">
+                        <h3>Recent Bookings</h3>
+                        <p>Latest booking activities</p>
+                    </div>
+
+                    <div class="bookings-list" id="recent-bookings">
+                        <!-- Bookings will be loaded here -->
+                    </div>
+
+                    <div class="view-all">
+                        <button onclick="navigateTo('manage-bookings')" class="btn-primary">View All Bookings</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Car Content -->
+            <div id="add-car-content" class="content-section">
+                <div class="content-header">
+                    <h1>Add New Car</h1>
+                    <p>List your car for rent</p>
+                </div>
+
+                <div class="form-container">
+                    <form id="add-car-form" class="car-form">
+                        <div class="form-group">
+                            <label for="car-name">Car Name:</label>
+                            <input type="text" id="car-name" placeholder="BMW X5" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="car-model">Model:</label>
+                            <input type="text" id="car-model" placeholder="2023" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="car-price">Daily Price ($):</label>
+                            <input type="number" id="car-price" placeholder="150" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="car-location">Location:</label>
+                            <input type="text" id="car-location" placeholder="Downtown" required>
+                        </div>
+
+                        <button type="submit" class="btn-primary">Add Car</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Manage Cars Content -->
+            <div id="manage-cars-content" class="content-section">
+                <div class="content-header">
+                    <h1>Manage Cars</h1>
+                    <p>View and manage your car listings</p>
+                </div>
+
+                <div class="cars-list" id="owner-cars-list">
+                    <!-- Cars will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Manage Bookings Content -->
+            <div id="manage-bookings-content" class="content-section">
+                <div class="content-header">
+                    <h1>Manage Bookings</h1>
+                    <p>View and manage all booking requests</p>
+                </div>
+
+                <div class="bookings-list" id="all-bookings-list">
+                    <!-- All bookings will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

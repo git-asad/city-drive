@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Drive - Firebase Starter</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .content {
+            padding: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #4facfe;
+            border-bottom: 2px solid #4facfe;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .data-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 City Drive - Firebase Starter</h1>
+            <p>Complete Firebase setup for your car rental web app</p>
+        </div>
+
+        <div class="content">
+            <!-- Firebase Status -->
+            <div class="section">
+                <h2>🔥 Firebase Status</h2>
+                <div id="firebase-status" class="status info">Initializing Firebase...</div>
+            </div>
+
+            <!-- Authentication Section -->
+            <div class="section">
+                <h2>🔐 Authentication</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Sign Up</h3>
+                        <div class="form-group">
+                            <label for="signup-email">Email:</label>
+                            <input type="email" id="signup-email" placeholder="user@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-password">Password:</label>
+                            <input type="password" id="signup-password" placeholder="Min 6 characters">
+                        </div>
+                        <button class="btn" onclick="signUp()">Sign Up</button>
+                    </div>
+
+                    <div class="card">
+                        <h3>Sign In</h3>
+                        <div class="form-group">
+                            <label for="signin-email">Email:</label>
+                            <input type="email" id="signin-email" placeholder="user@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="signin-password">Password:</label>
+                            <input type="password" id="signin-password" placeholder="Your password">
+                        </div>
+                        <button class="btn" onclick="signIn()">Sign In</button>
+                    </div>
+
+                    <div class="card">
+                        <h3>User Status</h3>
+                        <div id="user-status" class="status info">Not signed in</div>
+                        <button class="btn btn-danger" onclick="signOut()">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Firestore Section -->
+            <div class="section">
+                <h2>📊 Firestore Database</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Add Sample Car</h3>
+                        <div class="form-group">
+                            <label for="car-name">Car Name:</label>
+                            <input type="text" id="car-name" placeholder="BMW X5">
+                        </div>
+                        <div class="form-group">
+                            <label for="car-model">Model:</label>
+                            <input type="text" id="car-model" placeholder="2023">
+                        </div>
+                        <div class="form-group">
+                            <label for="car-price">Daily Price ($):</label>
+                            <input type="number" id="car-price" placeholder="150">
+                        </div>
+                        <button class="btn" onclick="addSampleCar()">Add Car</button>
+                    </div>
+
+                    <div class="card">
+                        <h3>Get All Cars</h3>
+                        <button class="btn" onclick="getAllCars()">Load Cars</button>
+                        <div id="cars-list" class="data-display">Cars will appear here...</div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Database Status</h3>
+                        <div id="db-status" class="status info">Ready to connect</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collections Preview -->
+            <div class="section">
+                <h2>📁 Collections Structure</h2>
+                <div class="data-display">
+Future Collections Structure:
+├── users/           # User profiles and preferences
+├── cars/            # Car inventory and details
+├── bookings/        # Rental bookings and reservations
+├── reviews/         # User reviews and ratings
+└── payments/        # Payment records and transactions
+                </div>
+            </div>
+
+            <!-- Console Output -->
+            <div class="section">
+                <h2>📝 Console Output</h2>
+                <div id="console-output" class="data-display">Firebase operations will be logged here...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
+        import {
+            getAuth,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            signOut as firebaseSignOut,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            getDocs,
+            doc,
+            setDoc,
+            getDoc
+        } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+        // TODO: Replace with your actual Firebase project configuration
+        // Get these values from your Firebase Console > Project Settings > General > Your apps
+        const firebaseConfig = {
+            apiKey: "AIzaSyBf-ZFhG8tesNnulOqO_zppcU5wC9pj6MM",
+            authDomain: "city-drive-953c0.firebaseapp.com",
+            projectId: "city-drive-953c0",
+            storageBucket: "city-drive-953c0.firebasestorage.app",
+            messagingSenderId: "83138806155",
+            appId: "1:83138806155:web:e7d967dbeddee9e47daf8e",
+            measurementId: "G-RB3LNG1J3K"
+        };
+
+        // Global variables to hold Firebase instances
+        let app;
+        let auth;
+        let db;
+        let analytics;
+
+        // Initialize Firebase
+        function initializeFirebase() {
+            try {
+                console.log('🔥 Initializing Firebase...');
+
+                // Initialize Firebase App
+                app = initializeApp(firebaseConfig);
+                console.log('✅ Firebase App initialized');
+
+                // Initialize Firebase Auth
+                auth = getAuth(app);
+                console.log('✅ Firebase Auth initialized');
+
+                // Initialize Firestore
+                db = getFirestore(app);
+                console.log('✅ Firestore initialized');
+
+                // Initialize Analytics (optional)
+                analytics = getAnalytics(app);
+                console.log('✅ Firebase Analytics initialized');
+
+                // Update UI
+                updateFirebaseStatus('✅ Firebase initialized successfully!');
+                logToConsole('Firebase initialized successfully!');
+
+                // Set up auth state listener
+                setupAuthListener();
+
+            } catch (error) {
+                console.error('❌ Firebase initialization failed:', error);
+                updateFirebaseStatus('❌ Firebase initialization failed: ' + error.message);
+                logToConsole('Firebase initialization failed: ' + error.message);
+            }
+        }
+
+        // Set up authentication state listener
+        function setupAuthListener() {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    console.log('👤 User signed in:', user.email);
+                    updateUserStatus(`✅ Signed in as: ${user.email}`);
+                    logToConsole(`User signed in: ${user.email} (UID: ${user.uid})`);
+                } else {
+                    console.log('👤 User signed out');
+                    updateUserStatus('Not signed in');
+                    logToConsole('User signed out');
+                }
+            });
+        }
+
+        // Authentication Functions
+        async function signUp() {
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+
+            if (!email || !password) {
+                alert('Please enter both email and password');
+                return;
+            }
+
+            try {
+                console.log('📝 Creating user account...');
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                console.log('✅ User account created:', user.email);
+                logToConsole(`User account created: ${user.email}`);
+
+                // Create user document in Firestore
+                await createUserDocument(user);
+
+                alert('Account created successfully!');
+
+            } catch (error) {
+                console.error('❌ Sign up failed:', error);
+                alert('Sign up failed: ' + error.message);
+                logToConsole('Sign up failed: ' + error.message);
+            }
+        }
+
+        async function signIn() {
+            const email = document.getElementById('signin-email').value;
+            const password = document.getElementById('signin-password').value;
+
+            if (!email || !password) {
+                alert('Please enter both email and password');
+                return;
+            }
+
+            try {
+                console.log('🔑 Signing in user...');
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                console.log('✅ User signed in:', user.email);
+                logToConsole(`User signed in: ${user.email}`);
+
+                alert('Signed in successfully!');
+
+            } catch (error) {
+                console.error('❌ Sign in failed:', error);
+                alert('Sign in failed: ' + error.message);
+                logToConsole('Sign in failed: ' + error.message);
+            }
+        }
+
+        async function signOut() {
+            try {
+                console.log('🚪 Signing out user...');
+                await firebaseSignOut(auth);
+                console.log('✅ User signed out');
+                logToConsole('User signed out successfully');
+            } catch (error) {
+                console.error('❌ Sign out failed:', error);
+                alert('Sign out failed: ' + error.message);
+                logToConsole('Sign out failed: ' + error.message);
+            }
+        }
+
+        // Firestore Functions
+        async function createUserDocument(user) {
+            try {
+                console.log('📄 Creating user document in Firestore...');
+
+                const userDoc = {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName || user.email.split('@')[0],
+                    createdAt: new Date(),
+                    role: 'customer', // Default role
+                    profileComplete: false
+                };
+
+                // Add user document to 'users' collection
+                const docRef = await addDoc(collection(db, 'users'), userDoc);
+
+                console.log('✅ User document created with ID:', docRef.id);
+                logToConsole(`User document created: ${docRef.id}`);
+
+            } catch (error) {
+                console.error('❌ Failed to create user document:', error);
+                logToConsole('Failed to create user document: ' + error.message);
+            }
+        }
+
+        async function addSampleCar() {
+            const carName = document.getElementById('car-name').value;
+            const carModel = document.getElementById('car-model').value;
+            const carPrice = parseFloat(document.getElementById('car-price').value);
+
+            if (!carName || !carModel || !carPrice) {
+                alert('Please fill in all car details');
+                return;
+            }
+
+            try {
+                console.log('🚗 Adding sample car to Firestore...');
+
+                const carDoc = {
+                    name: carName,
+                    model: carModel,
+                    pricePerDay: carPrice,
+                    category: 'SUV',
+                    fuelType: 'Gasoline',
+                    transmission: 'Automatic',
+                    seatingCapacity: 5,
+                    available: true,
+                    location: 'Downtown',
+                    description: `Beautiful ${carName} ${carModel} available for rent`,
+                    features: ['Air Conditioning', 'GPS', 'Bluetooth'],
+                    images: ['placeholder-image.jpg'],
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+
+                // Add car document to 'cars' collection
+                const docRef = await addDoc(collection(db, 'cars'), carDoc);
+
+                console.log('✅ Car added with ID:', docRef.id);
+                logToConsole(`Car added: ${carName} ${carModel} (ID: ${docRef.id})`);
+
+                // Clear form
+                document.getElementById('car-name').value = '';
+                document.getElementById('car-model').value = '';
+                document.getElementById('car-price').value = '';
+
+                alert('Car added successfully!');
+
+                // Refresh cars list
+                getAllCars();
+
+            } catch (error) {
+                console.error('❌ Failed to add car:', error);
+                alert('Failed to add car: ' + error.message);
+                logToConsole('Failed to add car: ' + error.message);
+            }
+        }
+
+        async function getAllCars() {
+            try {
+                console.log('📋 Fetching all cars from Firestore...');
+
+                const querySnapshot = await getDocs(collection(db, 'cars'));
+                const cars = [];
+
+                querySnapshot.forEach((doc) => {
+                    cars.push({ id: doc.id, ...doc.data() });
+                });
+
+                console.log(`✅ Retrieved ${cars.length} cars`);
+                logToConsole(`Retrieved ${cars.length} cars from database`);
+
+                // Display cars
+                displayCars(cars);
+
+            } catch (error) {
+                console.error('❌ Failed to fetch cars:', error);
+                logToConsole('Failed to fetch cars: ' + error.message);
+                document.getElementById('cars-list').textContent = 'Error loading cars: ' + error.message;
+            }
+        }
+
+        function displayCars(cars) {
+            if (cars.length === 0) {
+                document.getElementById('cars-list').textContent = 'No cars found in database';
+                return;
+            }
+
+            const carsHtml = cars.map(car => `
+🚗 ${car.name} ${car.model}
+   💰 $${car.pricePerDay}/day
+   📍 ${car.location}
+   🏷️ ${car.available ? 'Available' : 'Not Available'}
+   📅 Created: ${car.createdAt?.toDate?.()?.toLocaleDateString() || 'N/A'}
+   ID: ${car.id}
+
+`).join('');
+
+            document.getElementById('cars-list').textContent = carsHtml;
+        }
+
+        // UI Helper Functions
+        function updateFirebaseStatus(message) {
+            const statusEl = document.getElementById('firebase-status');
+            statusEl.textContent = message;
+            statusEl.className = message.includes('✅') ? 'status success' :
+                               message.includes('❌') ? 'status error' : 'status info';
+        }
+
+        function updateUserStatus(message) {
+            const statusEl = document.getElementById('user-status');
+            statusEl.textContent = message;
+            statusEl.className = message.includes('✅') ? 'status success' :
+                               message.includes('Not signed in') ? 'status info' : 'status error';
+        }
+
+        function updateDbStatus(message) {
+            const statusEl = document.getElementById('db-status');
+            statusEl.textContent = message;
+            statusEl.className = message.includes('✅') ? 'status success' :
+                               message.includes('❌') ? 'status error' : 'status info';
+        }
+
+        function logToConsole(message) {
+            const consoleEl = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            consoleEl.textContent += `[${timestamp}] ${message}\n`;
+
+            // Auto-scroll to bottom
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        // Make functions globally available
+        window.signUp = signUp;
+        window.signIn = signIn;
+        window.signOut = signOut;
+        window.addSampleCar = addSampleCar;
+        window.getAllCars = getAllCars;
+
+        // Initialize Firebase when page loads
+        document.addEventListener('DOMContentLoaded', initializeFirebase);
+
+        console.log('🎯 City Drive Firebase Starter loaded!');
+        console.log('📝 Replace the firebaseConfig object with your actual Firebase project values');
+    </script>
+</body>
+</html>

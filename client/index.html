@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Performance Optimizations -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/src/index.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/src/index.min.css"></noscript>
+
+    <!-- SEO and Performance Meta Tags -->
+    <meta name="description" content="Premium car rental services with modern vehicles and excellent customer service">
+    <meta name="keywords" content="car rental, vehicle hire, premium cars, luxury rental">
+    <meta name="author" content="City Drive">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph for Social Sharing -->
+    <meta property="og:title" content="City Drive - Premium Car Rental">
+    <meta property="og:description" content="Premium car rental services with modern vehicles">
+    <meta property="og:type" content="website">
+
+    <title>City Drive - Premium Car Rental</title>
+
+    <!-- Performance: Load CSS asynchronously -->
+    <style>
+      /* Critical CSS - Above the fold content */
+      body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+      #root { min-height: 100vh; }
+      /* Loading spinner for initial load */
+      .initial-loader { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; }
+    </style>
+  </head>
+  <body>
+    <!-- Initial loading indicator -->
+    <div id="initial-loader" class="initial-loader">
+      <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+    </div>
+
+    <div id="root"></div>
+
+    <!-- Performance: Defer non-critical scripts -->
+    <script>
+      // Remove initial loader once React loads
+      window.addEventListener('load', function() {
+        const loader = document.getElementById('initial-loader');
+        if (loader) loader.style.display = 'none';
+      });
+
+      // Performance: Preload critical routes
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          // Service worker for caching (implement later)
+        });
+      }
+    </script>
+
+    <!-- Main React script with defer for better performance -->
+    <script type="module" src="/src/main.jsx" defer></script>
+
+    <!--
+    PERFORMANCE OPTIMIZATION NOTES:
+    ================================
+
+    1. CDN & CACHING SETUP (Implement in production):
+       - Use CDN for static assets: https://cdn.example.com/
+       - Add cache headers: Cache-Control: public, max-age=31536000
+       - Use service worker for offline caching
+       - Implement HTTP/2 for better parallel loading
+
+    2. IMAGE OPTIMIZATION:
+       - Convert images to WebP format with JPEG fallbacks
+       - Use responsive images: <img srcset="..." sizes="..." />
+       - Consider lazy loading with Intersection Observer
+       - Use image CDNs like Cloudinary for automatic optimization
+
+    3. ADDITIONAL OPTIMIZATIONS TO CONSIDER:
+       - Code splitting with React.lazy() and Suspense
+       - Bundle analysis with webpack-bundle-analyzer
+       - Tree shaking for unused dependencies
+       - Compression with gzip/brotli
+       - Critical CSS extraction for above-the-fold content
+
+    4. MONITORING:
+       - Use Lighthouse for performance audits
+       - Monitor Core Web Vitals
+       - Set up real user monitoring (RUM)
+       - Use WebPageTest for detailed analysis
+    -->
+  </body>
+</html>
+
