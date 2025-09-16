@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - City Drive | Luxury Car Rental Experts</title>
+    <meta name="description" content="Learn about City Drive's mission to provide exceptional luxury car rental experiences. Meet our team and discover our commitment to excellence.">
+    <meta name="keywords" content="about City Drive, luxury car rental company, car rental experts, premium vehicles">
+    <meta name="author" content="City Drive">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="About City Drive - Luxury Car Rental Experts">
+    <meta property="og:description" content="Discover City Drive's story and commitment to providing exceptional luxury car rental experiences.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* About Page Styles */
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            min-height: 100vh;
+        }
+
+        .about-hero {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+            color: white;
+            padding: 80px 0 60px;
+            text-align: center;
+        }
+
+        .about-hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .about-hero p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .stats-section {
+            background: white;
+            padding: 60px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #6366f1;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .story-section {
+            padding: 80px 0;
+        }
+
+        .story-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .story-content h2 {
+            font-size: 2.5rem;
+            color: #1e293b;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .story-content p {
+            font-size: 1.1rem;
+            color: #64748b;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .story-image {
+            text-align: center;
+        }
+
+        .story-image img {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .values-section {
+            background: white;
+            padding: 80px 0;
+        }
+
+        .values-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .values-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .values-header h2 {
+            font-size: 2.5rem;
+            color: #1e293b;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .values-header p {
+            font-size: 1.2rem;
+            color: #64748b;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .value-card {
+            background: #f8fafc;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .value-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .value-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .value-card h3 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .value-card p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .team-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        .team-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .team-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .team-header h2 {
+            font-size: 2.5rem;
+            color: #1e293b;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .team-header p {
+            font-size: 1.2rem;
+            color: #64748b;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .team-member {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .team-member:hover {
+            transform: translateY(-5px);
+        }
+
+        .member-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 3rem;
+            color: white;
+        }
+
+        .team-member h3 {
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .member-role {
+            color: #6366f1;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .member-bio {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .mission-section {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .mission-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .mission-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .mission-section p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            line-height: 1.7;
+            margin-bottom: 40px;
+        }
+
+        .mission-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .mission-feature {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .mission-feature h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .mission-feature p {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .cta-section {
+            background: white;
+            padding: 80px 0;
+        }
+
+        .cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .cta-container h2 {
+            font-size: 2.5rem;
+            color: #1e293b;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .cta-container p {
+            font-size: 1.2rem;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary-large {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border: none;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary-large:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary-large {
+            background: transparent;
+            border: 2px solid #6366f1;
+            padding: 14px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            color: #6366f1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary-large:hover {
+            background: #6366f1;
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .about-hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .about-hero p {
+                font-size: 1.1rem;
+            }
+
+            .story-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .story-content h2 {
+                font-size: 2rem;
+            }
+
+            .values-grid,
+            .team-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .mission-features {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-primary-large,
+            .btn-secondary-large {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Luxury Loading Screen -->
+    <div id="luxury-loader" class="luxury-loader">
+        <div class="loader-content">
+            <div class="loader-logo">City Drive</div>
+            <div class="loader-text">Loading Experience</div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html">
+                    <img src="assets/logo.svg" alt="City Drive" onclick="navigateTo('home')">
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="index.html#home" class="nav-link">Home</a>
+                <a href="cars.html" class="nav-link">Cars</a>
+                <a href="my-bookings.html" class="nav-link">My Bookings</a>
+                <a href="about.html" class="nav-link active">About</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="nav-auth">
+                <button onclick="showLoginModal()" class="btn-secondary">Login</button>
+                <button onclick="showSignupModal()" class="btn-primary">Sign Up</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- About Hero -->
+    <section class="about-hero">
+        <div class="container">
+            <h1>About City Drive</h1>
+            <p>Redefining luxury car rental with premium vehicles, exceptional service, and unforgettable experiences since 2010.</p>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">5000+</div>
+                <div class="stat-label">Happy Customers</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">1000+</div>
+                <div class="stat-label">Luxury Vehicles</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Locations Worldwide</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Customer Support</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Story Section -->
+    <section class="story-section">
+        <div class="story-container">
+            <div class="story-content">
+                <h2>Our Story</h2>
+                <p>Founded in 2010, City Drive began with a simple mission: to provide luxury car rental experiences that exceed expectations. What started as a small operation in downtown New York has grown into a global network of premium vehicle rentals.</p>
+                <p>We believe that every journey should be extraordinary. Whether you're planning a special occasion, conducting business travel, or simply want to experience the thrill of driving a luxury vehicle, we're here to make it happen.</p>
+                <p>Our commitment to excellence drives everything we do. From our meticulously maintained fleet of high-end vehicles to our dedicated customer service team, we strive to deliver unparalleled experiences that create lasting memories.</p>
+            </div>
+            <div class="story-image">
+                <img src="assets/main_car.png" alt="City Drive Story">
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Values Section -->
+    <section class="values-section">
+        <div class="values-container">
+            <div class="values-header">
+                <h2>Our Values</h2>
+                <p>The principles that guide our business and shape every customer interaction.</p>
+            </div>
+
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">🏆</div>
+                    <h3>Excellence</h3>
+                    <p>We maintain the highest standards in vehicle quality, service, and customer satisfaction.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">🤝</div>
+                    <h3>Trust</h3>
+                    <p>Building lasting relationships through transparency, reliability, and honest communication.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">🚀</div>
+                    <h3>Innovation</h3>
+                    <p>Continuously improving our services with the latest technology and industry best practices.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">🌍</div>
+                    <h3>Sustainability</h3>
+                    <p>Committed to eco-friendly practices and reducing our environmental impact.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section">
+        <div class="team-container">
+            <div class="team-header">
+                <h2>Meet Our Team</h2>
+                <p>The passionate professionals dedicated to making your luxury car rental experience exceptional.</p>
+            </div>
+
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="member-avatar">👩‍💼</div>
+                    <h3>Sarah Johnson</h3>
+                    <p class="member-role">CEO & Founder</p>
+                    <p class="member-bio">With over 15 years in luxury automotive services, Sarah leads our vision for exceptional car rental experiences.</p>
+                </div>
+
+                <div class="team-member">
+                    <div class="member-avatar">👨‍💼</div>
+                    <h3>Michael Chen</h3>
+                    <p class="member-role">Head of Operations</p>
+                    <p class="member-bio">Michael ensures every vehicle meets our premium standards and every customer receives world-class service.</p>
+                </div>
+
+                <div class="team-member">
+                    <div class="member-avatar">👩‍💻</div>
+                    <h3>Emma Rodriguez</h3>
+                    <p class="member-role">Customer Experience Director</p>
+                    <p class="member-bio">Emma and her team are dedicated to making every rental experience memorable and stress-free.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="mission-section">
+        <div class="mission-container">
+            <h2>Our Mission</h2>
+            <p>To revolutionize the car rental industry by providing unparalleled luxury experiences, exceptional customer service, and innovative solutions that make every journey memorable.</p>
+
+            <div class="mission-features">
+                <div class="mission-feature">
+                    <h3>Customer First</h3>
+                    <p>Every decision we make prioritizes our customers' needs and satisfaction.</p>
+                </div>
+                <div class="mission-feature">
+                    <h3>Quality Excellence</h3>
+                    <p>We maintain the highest standards in everything we do, from vehicles to service.</p>
+                </div>
+                <div class="mission-feature">
+                    <h3>Innovation</h3>
+                    <p>We embrace new technologies and ideas to enhance your rental experience.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-container">
+            <h2>Ready to Experience Luxury?</h2>
+            <p>Join thousands of satisfied customers who trust City Drive for their luxury car rental needs.</p>
+            <div class="cta-buttons">
+                <button onclick="document.getElementById('pickup-location').focus()" class="btn-primary-large">Browse Our Fleet</button>
+                <button onclick="showSignupModal()" class="btn-secondary-large">Create Free Account</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>City Drive</h3>
+                <p>Your trusted car rental platform for luxury vehicles</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">📘</a>
+                    <a href="#" class="social-link">🐦</a>
+                    <a href="#" class="social-link">📷</a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html#home">Home</a></li>
+                    <li><a href="cars.html">Cars</a></li>
+                    <li><a href="my-bookings.html">My Bookings</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Services</h4>
+                <ul>
+                    <li><a href="#">Car Rental</a></li>
+                    <li><a href="#">Luxury Fleet</a></li>
+                    <li><a href="#">Airport Transfer</a></li>
+                    <li><a href="#">Chauffeur Service</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="contact.html">Help Center</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2024 City Drive. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // About Page Specific JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loading overlay
+            setTimeout(() => {
+                document.getElementById('luxury-loader').classList.add('loaded');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

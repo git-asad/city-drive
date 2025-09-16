@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/server';
 
 // Helper function to get auth token
 const getAuthToken = () => {
@@ -16,7 +16,7 @@ const setAuthToken = (token) => {
 
 // Generic API request function
 const apiRequest = async (endpoint, options = {}) => {
-  const url = `${API_BASE_URL}${endpoint}`;
+  const url = `${API_BASE_URL}/api${endpoint}`;
   const token = getAuthToken();
 
   const config = {

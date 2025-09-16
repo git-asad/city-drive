@@ -17,30 +17,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Firebase CDN -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
-        import { getAuth } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
-        import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
-
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBf-ZFhG8tesNnulOqO_zppcU5wC9pj6MM",
-            authDomain: "city-drive-953c0.firebaseapp.com",
-            projectId: "city-drive-953c0",
-            storageBucket: "city-drive-953c0.firebasestorage.app",
-            messagingSenderId: "83138806155",
-            appId: "1:83138806155:web:e7d967dbeddee9e47daf8e",
-            measurementId: "G-RB3LNG1J3K"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        window.auth = getAuth(app);
-        window.db = getFirestore(app);
-
-        console.log('Firebase initialized successfully');
-    </script>
     <style>
         /* Page Load Animation */
         body {
@@ -306,10 +282,10 @@
 
         /* Modern Interactive Hero Background */
         .hero-section {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #06b6d4 50%, #6366f1 75%, #8b5cf6 100%);
+            background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #0f172a 100%);
             position: relative;
             overflow: hidden;
-            min-height: 100vh;
+            min-height: 90vh;
             /* Performance optimization */
             will-change: transform;
             backface-visibility: hidden;
@@ -335,15 +311,15 @@
             line-height: 1.6;
         }
 
-        /* Modern color scheme variables */
+        /* Modern color scheme variables - Dark Theme */
         :root {
-            --modern-indigo: #6366f1;
-            --modern-purple: #8b5cf6;
-            --modern-cyan: #06b6d4;
-            --modern-white: #ffffff;
-            --modern-gray: #f8fafc;
-            --modern-dark: #1e293b;
-            --modern-light: #f1f5f9;
+            --modern-indigo: #4f46e5;
+            --modern-purple: #7c3aed;
+            --modern-cyan: #0891b2;
+            --modern-white: #1e293b;
+            --modern-gray: #0f172a;
+            --modern-dark: #ffffff;
+            --modern-light: #334155;
         }
 
         /* Interactive Animation Layers */
@@ -707,7 +683,8 @@
         }
 
         .why-choose-section {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: #ffffff;
         }
 
         .final-cta-section {
@@ -1666,7 +1643,7 @@
 
         .step-details span {
             font-size: 0.85rem;
-            color: #64748b;
+            color: #cbd5e1;
             display: flex;
             align-items: center;
             gap: 5px;
@@ -1879,13 +1856,15 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <img src="assets/logo.svg" alt="City Drive" onclick="navigateTo('home')">
+                <a href="index.html">
+                    <img src="assets/logo.svg" alt="City Drive">
+                </a>
             </div>
             <div class="nav-links">
-                <a href="#home" class="nav-link active">Home</a>
+                <a href="index.html" class="nav-link active">Home</a>
                 <a href="cars.html" class="nav-link">Cars</a>
                 <a href="my-bookings.html" class="nav-link">My Bookings</a>
-                <a href="#about" class="nav-link">About</a>
+                <a href="about.html" class="nav-link">About</a>
                 <a href="contact.html" class="nav-link">Contact</a>
             </div>
             <div class="nav-auth">
@@ -1896,7 +1875,7 @@
     </nav>
 
     <!-- Hero Section -->
-    <section id="home" class="hero-section">
+    <section class="hero-section">
         <!-- Interactive Animation Layers -->
         <div class="hero-animation-layer">
             <div class="gradient-orb-primary"></div>
@@ -1923,336 +1902,35 @@
 
         <div class="hero-container">
             <div class="hero-content">
-                <div class="trust-indicators">
-                    <div class="trust-item animate-fade-in-up floating-element">
-                        <div class="trust-dot glow"></div>
-                        <span>🚀 Instant Booking</span>
-                    </div>
-                    <div class="trust-item animate-fade-in-up animation-delay-200 floating-element">
-                        <div class="trust-dot glow"></div>
-                        <span>🛡️ Full Insurance</span>
-                    </div>
-                    <div class="trust-item animate-fade-in-up animation-delay-400 floating-element">
-                        <div class="trust-dot glow"></div>
-                        <span>💎 Premium Fleet</span>
-                    </div>
-                    <div class="trust-item animate-fade-in-up animation-delay-600 floating-element">
-                        <div class="trust-dot glow"></div>
-                        <span>📞 24/7 Support</span>
-                    </div>
-                </div>
-
                 <div class="hero-text">
-                    <h1 class="hero-title animate-fade-in-up animation-delay-800">
-                        Drive Your <span class="highlight">Dreams</span> Today
+                    <h1 class="hero-title">
+                        Find Your <span class="highlight">Dream Car</span> Today
                     </h1>
-                    <p class="hero-subtitle animate-fade-in-up animation-delay-1000">
-                        Experience unparalleled luxury on wheels. From sleek sedans to powerful SUVs,
-                        discover the perfect vehicle for your journey with City Drive's elite collection.
+                    <p class="hero-subtitle">
+                        Luxury, comfort, and performance at your fingertips.
                     </p>
-                    <div class="hero-stats animate-fade-in-up animation-delay-1200">
-                        <div class="stat-item">
-                            <div class="stat-number">500+</div>
-                            <div class="stat-label">Premium Cars</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">50K+</div>
-                            <div class="stat-label">Happy Customers</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">4.9★</div>
-                            <div class="stat-label">Average Rating</div>
-                        </div>
-                    </div>
                 </div>
 
-                <div class="booking-form animate-fade-in-up animation-delay-1500 glass-card">
-                    <div class="form-header">
-                        <h3 class="text-gradient">Find Your Perfect Car</h3>
-                        <p>Choose from our premium fleet</p>
-                    </div>
-                    <form class="form-container" onsubmit="handleBookingSubmit(event)">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <span class="form-icon">📍</span>
-                                    Pickup Location
-                                </label>
-                                <select id="pickup-location" class="form-select glass-button" required>
-                                    <option value="">Select Location</option>
-                                    <option value="New York, NY">New York, NY</option>
-                                    <option value="Los Angeles, CA">Los Angeles, CA</option>
-                                    <option value="Chicago, IL">Chicago, IL</option>
-                                    <option value="Houston, TX">Houston, TX</option>
-                                    <option value="Miami, FL">Miami, FL</option>
-                                    <option value="San Francisco, CA">San Francisco, CA</option>
-                                    <option value="Las Vegas, NV">Las Vegas, NV</option>
-                                    <option value="Orlando, FL">Orlando, FL</option>
-                                    <option value="Seattle, WA">Seattle, WA</option>
-                                    <option value="Boston, MA">Boston, MA</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <span class="form-icon">📅</span>
-                                    Pick-up Date
-                                </label>
-                                <input type="date" id="pickup-date" class="form-input glass-button" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <span class="form-icon">📅</span>
-                                    Return Date
-                                </label>
-                                <input type="date" id="return-date" class="form-input glass-button" required>
-                            </div>
-
-                            <div class="form-group">
-                                <button type="submit" class="btn-search btn-premium">
-                                    <span class="search-icon">🚀</span>
-                                    <span class="shimmer"></span>
-                                    Find Cars
-                                </button>
-                            </div>
-                        </div>
-                        <div class="form-footer">
-                            <span class="form-note">✨ Free cancellation up to 24 hours</span>
-                            <span class="form-note">🛡️ Full insurance included</span>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="hero-image">
-                    <img src="assets/main_car.png" alt="Luxury Car" class="car-image">
-
-                    <!-- Floating Stats -->
-                    <div class="stat-card stat-1">
-                        <div class="stat-number">50+</div>
-                        <div class="stat-label">Car Available</div>
-                    </div>
-
-                    <div class="stat-card stat-2">
-                        <div class="stat-number">5K+</div>
-                        <div class="stat-label">Happy Customer</div>
-                    </div>
-
-                    <div class="stat-card stat-3">
-                        <div class="stat-number">4.9★</div>
-                        <div class="stat-label">Average Rating</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Why Choose Us Section -->
-    <section class="why-choose-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Why Choose City Drive?</h2>
-                <p class="section-subtitle">Experience luxury car rental like never before with our premium services</p>
-            </div>
-
-            <div class="features-grid">
-                <div class="feature-card animate-bounce-in interactive-card card-3d">
-                    <div class="feature-icon floating-element">🏆</div>
-                    <h3 class="text-gradient">Luxury Fleet</h3>
-                    <p>BMW, Mercedes, Audi, Porsche & more. Only the finest vehicles in pristine condition.</p>
-                </div>
-
-                <div class="feature-card animate-bounce-in animation-delay-200 interactive-card card-3d">
-                    <div class="feature-icon floating-element">🛡️</div>
-                    <h3 class="text-gradient">Zero Deductible Insurance</h3>
-                    <p>Complete peace of mind with comprehensive coverage and zero deductible options.</p>
-                </div>
-
-                <div class="feature-card animate-bounce-in animation-delay-400 interactive-card card-3d">
-                    <div class="feature-icon floating-element">🚀</div>
-                    <h3 class="text-gradient">Instant Booking</h3>
-                    <p>Book in under 2 minutes. No paperwork, no hassle. Drive away immediately.</p>
-                </div>
-
-                <div class="feature-card animate-bounce-in animation-delay-600 interactive-card card-3d">
-                    <div class="feature-icon floating-element">📞</div>
-                    <h3 class="text-gradient">Concierge Service</h3>
-                    <p>Dedicated luxury concierge available 24/7 for any assistance you need.</p>
-                </div>
-
-                <div class="feature-card animate-bounce-in animation-delay-800 interactive-card card-3d">
-                    <div class="feature-icon floating-element">💎</div>
-                    <h3 class="text-gradient">VIP Treatment</h3>
-                    <p>Priority service, premium perks, and exclusive member benefits.</p>
-                </div>
-
-                <div class="feature-card animate-bounce-in animation-delay-1000 interactive-card card-3d">
-                    <div class="feature-icon floating-element">🎯</div>
-                    <h3 class="text-gradient">Best Price Guarantee</h3>
-                    <p>Find a better price? We'll match it and give you an additional 10% off.</p>
-                </div>
-            </div>
-
-            <div class="trust-badges">
-                <div class="badge">
-                    <img src="assets/star_icon.svg" alt="rating">
-                    <span>4.9/5 Customer Rating</span>
-                </div>
-                <div class="badge">
-                    <span class="award-icon">🏆</span>
-                    <span>#1 Luxury Car Rental</span>
-                </div>
-                <div class="badge">
-                    <span class="secure-icon">🔒</span>
-                    <span>SSL Secured</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works Section -->
-    <section class="how-it-works-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">How It Works</h2>
-                <p class="section-subtitle">Your journey to luxury begins with these simple steps</p>
-            </div>
-
-            <div class="steps-container">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-icon">🔍</div>
-                    <h3>Choose Your Car</h3>
-                    <p>Browse our premium fleet of luxury vehicles. Filter by type, price, and availability. View detailed specs, photos, and reviews for each car.</p>
-                    <div class="step-details">
-                        <span>✨ 50+ luxury vehicles</span>
-                        <span>📱 Real-time availability</span>
-                        <span>⭐ Customer reviews</span>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-icon">📅</div>
-                    <h3>Book Online</h3>
-                    <p>Select your dates, pickup location, and complete secure payment. Get instant confirmation and booking details via email and SMS.</p>
-                    <div class="step-details">
-                        <span>🔒 SSL encrypted payment</span>
-                        <span>📧 Instant confirmation</span>
-                        <span>📱 SMS notifications</span>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-icon">🚗</div>
-                    <h3>Pickup & Drive</h3>
-                    <p>Arrive at your pickup location with ID and license. Complete quick paperwork and drive away in your luxury vehicle.</p>
-                    <div class="step-details">
-                        <span>📍 Multiple locations</span>
-                        <span>⏰ Express pickup</span>
-                        <span>🛡️ Full insurance included</span>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <div class="step-icon">🔄</div>
-                    <h3>Return & Enjoy</h3>
-                    <p>Return your vehicle at the designated time. No hidden fees, transparent pricing, and exceptional service throughout.</p>
-                    <div class="step-details">
-                        <span>💰 No hidden fees</span>
-                        <span>📞 24/7 support</span>
-                        <span>🎯 Satisfaction guarantee</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="process-benefits">
-                <div class="benefit-highlight">
-                    <h3>Why Choose Our Process?</h3>
-                    <div class="benefits-grid">
-                        <div class="benefit-item">
-                            <span class="benefit-icon">⚡</span>
-                            <div class="benefit-text">
-                                <strong>Lightning Fast</strong>
-                                <p>Book in under 2 minutes</p>
-                            </div>
-                        </div>
-                        <div class="benefit-item">
-                            <span class="benefit-icon">🛡️</span>
-                            <div class="benefit-text">
-                                <strong>Fully Protected</strong>
-                                <p>Complete insurance coverage</p>
-                            </div>
-                        </div>
-                        <div class="benefit-item">
-                            <span class="benefit-icon">📱</span>
-                            <div class="benefit-text">
-                                <strong>Always Connected</strong>
-                                <p>Real-time updates & support</p>
-                            </div>
-                        </div>
-                        <div class="benefit-item">
-                            <span class="benefit-icon">💎</span>
-                            <div class="benefit-text">
-                                <strong>Luxury Experience</strong>
-                                <p>Premium service every step</p>
-                            </div>
-                        </div>
-                    </div>
+                <div class="hero-cta">
+                    <button onclick="window.location.href='cars.html'" class="btn-primary-large">
+                        <span class="btn-icon">🚗</span>
+                        Browse Cars
+                    </button>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Featured Cars Section -->
-    <section id="cars" class="featured-section">
+    <section class="featured-cars-section">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Featured Vehicles</h2>
-                <p class="section-subtitle">Explore our selection of premium vehicles</p>
+                <p class="section-subtitle">Discover our premium collection</p>
             </div>
 
-            <!-- Car Search & Filter -->
-            <div class="car-search-container">
-                <div class="search-filters">
-                    <div class="filter-group">
-                        <label for="car-type-filter">Car Type</label>
-                        <select id="car-type-filter" class="filter-select">
-                            <option value="">All Types</option>
-                            <option value="SUV">SUV</option>
-                            <option value="Sedan">Sedan</option>
-                            <option value="Luxury">Luxury</option>
-                            <option value="Sports">Sports</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="price-range-filter">Price Range</label>
-                        <select id="price-range-filter" class="filter-select">
-                            <option value="">All Prices</option>
-                            <option value="0-150">$0 - $150/day</option>
-                            <option value="150-250">$150 - $250/day</option>
-                            <option value="250-400">$250 - $400/day</option>
-                            <option value="400+">$400+/day</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="availability-filter">Available From</label>
-                        <input type="date" id="availability-filter" class="filter-input">
-                    </div>
-                    <div class="filter-group">
-                        <label for="search-input">Search Cars</label>
-                        <input type="text" id="search-input" class="filter-input" placeholder="Search by brand, model...">
-                    </div>
-                    <div class="filter-group">
-                        <button id="clear-filters" class="btn-secondary">Clear Filters</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="cars-grid" id="cars-grid">
-                <div class="car-card" data-type="SUV" data-price="300" data-brand="BMW" data-model="X5">
+            <div class="featured-cars-grid">
+                <div class="car-card">
                     <img src="assets/car_image1.png" alt="BMW X5" class="car-image">
                     <div class="car-info">
                         <h3>BMW X5</h3>
@@ -2263,12 +1941,12 @@
                         </div>
                         <div class="car-price">
                             <span class="price">$300/day</span>
-                            <button class="btn-book" onclick="bookCar('BMW X5', 300)">Book Now</button>
+                            <button class="btn-book" onclick="window.location.href='cars.html'">Book Now</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="car-card" data-type="Sedan" data-price="130" data-brand="Toyota" data-model="Corolla">
+                <div class="car-card">
                     <img src="assets/car_image2.png" alt="Toyota Corolla" class="car-image">
                     <div class="car-info">
                         <h3>Toyota Corolla</h3>
@@ -2279,12 +1957,12 @@
                         </div>
                         <div class="car-price">
                             <span class="price">$130/day</span>
-                            <button class="btn-book" onclick="bookCar('Toyota Corolla', 130)">Book Now</button>
+                            <button class="btn-book" onclick="window.location.href='cars.html'">Book Now</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="car-card" data-type="SUV" data-price="200" data-brand="Jeep" data-model="Wrangler">
+                <div class="car-card">
                     <img src="assets/car_image3.png" alt="Jeep Wrangler" class="car-image">
                     <div class="car-info">
                         <h3>Jeep Wrangler</h3>
@@ -2295,12 +1973,12 @@
                         </div>
                         <div class="car-price">
                             <span class="price">$200/day</span>
-                            <button class="btn-book" onclick="bookCar('Jeep Wrangler', 200)">Book Now</button>
+                            <button class="btn-book" onclick="window.location.href='cars.html'">Book Now</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="car-card" data-type="Sedan" data-price="209" data-brand="Ford" data-model="Neo 6">
+                <div class="car-card">
                     <img src="assets/car_image4.png" alt="Ford Neo 6" class="car-image">
                     <div class="car-info">
                         <h3>Ford Neo 6</h3>
@@ -2311,219 +1989,38 @@
                         </div>
                         <div class="car-price">
                             <span class="price">$209/day</span>
-                            <button class="btn-book" onclick="bookCar('Ford Neo 6', 209)">Book Now</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Additional Cars for Better Filtering Demo -->
-                <div class="car-card" data-type="Luxury" data-price="450" data-brand="Mercedes" data-model="S-Class">
-                    <img src="assets/main_car.png" alt="Mercedes S-Class" class="car-image">
-                    <div class="car-info">
-                        <h3>Mercedes S-Class</h3>
-                        <div class="car-details">
-                            <span>🚗 Luxury</span>
-                            <span>⛽ Gasoline</span>
-                            <span>👥 5 seats</span>
-                        </div>
-                        <div class="car-price">
-                            <span class="price">$450/day</span>
-                            <button class="btn-book" onclick="bookCar('Mercedes S-Class', 450)">Book Now</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="car-card" data-type="Sports" data-price="380" data-brand="Porsche" data-model="911">
-                    <img src="assets/bmw_new.png" alt="Porsche 911" class="car-image">
-                    <div class="car-info">
-                        <h3>Porsche 911</h3>
-                        <div class="car-details">
-                            <span>🚗 Sports</span>
-                            <span>⛽ Gasoline</span>
-                            <span>👥 2 seats</span>
-                        </div>
-                        <div class="car-price">
-                            <span class="price">$380/day</span>
-                            <button class="btn-book" onclick="bookCar('Porsche 911', 380)">Book Now</button>
+                            <button class="btn-book" onclick="window.location.href='cars.html'">Book Now</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="view-all">
-                <button class="btn-secondary">Explore All Cars</button>
+                <button onclick="window.location.href='cars.html'" class="btn-secondary">View All Cars</button>
             </div>
         </div>
     </section>
 
-
-    <!-- Banner Section -->
-    <section class="banner-section">
-        <div class="banner-container">
-            <div class="banner-content">
-                <div class="banner-text">
-                    <h2>Do You Own a Luxury Car?</h2>
-                    <p>Monetize your vehicle effortlessly by listing it on City Drive.</p>
-                    <p>We take care of insurance, driver verification and secure payments - so you can earn passive income, stress-free.</p>
-                    <button class="btn-primary">List your car</button>
-                </div>
-                <div class="banner-image">
-                    <img src="assets/banner_car_image.png" alt="Luxury Car">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="testimonials-section">
+    <!-- Contact Preview Section -->
+    <section class="contact-preview-section">
         <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Loved by Our Customers</h2>
-                <p class="section-subtitle">Real stories from real luxury car enthusiasts</p>
-            </div>
-
-            <div class="testimonials-grid">
-                <div class="testimonial-card animate-fade-in-up glass-card interactive-card">
-                    <div class="testimonial-quote floating-element">❝</div>
-                    <p class="testimonial-text">"The Mercedes S-Class I rented exceeded all expectations. Immaculate condition, powerful yet smooth ride. The pickup was seamless and the 24/7 concierge service made my business trip unforgettable. Worth every penny!"</p>
-                    <div class="testimonial-header">
-                        <img src="assets/testimonial_image_1.png" alt="Sarah Chen" class="testimonial-avatar magnetic">
-                        <div class="testimonial-info">
-                            <h4 class="text-gradient">Sarah Chen</h4>
-                            <span>CEO, Tech Startup • San Francisco</span>
+            <div class="contact-preview-content">
+                <div class="contact-info">
+                    <h2>Need Help?</h2>
+                    <p>Our luxury concierge team is available 24/7</p>
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <span class="contact-icon">📞</span>
+                            <span>+1 (555) 123-4567</span>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-icon">📧</span>
+                            <span>support@citydrive.com</span>
                         </div>
                     </div>
-                    <div class="testimonial-rating">
-                        ⭐⭐⭐⭐⭐
-                        <span class="rating-text">5.0</span>
-                    </div>
                 </div>
-
-                <div class="testimonial-card animate-fade-in-up animation-delay-300 glass-card interactive-card">
-                    <div class="testimonial-quote floating-element">❝</div>
-                    <p class="testimonial-text">"As a car enthusiast, I'm very particular about vehicles. City Drive's BMW M5 was in showroom condition. The booking process took 90 seconds, and their GPS tracking feature gave me complete peace of mind. Exceptional service!"</p>
-                    <div class="testimonial-header">
-                        <img src="assets/testimonial_image_2.png" alt="Marcus Johnson" class="testimonial-avatar magnetic">
-                        <div class="testimonial-info">
-                            <h4 class="text-gradient">Marcus Johnson</h4>
-                            <span>Automotive Journalist • Chicago</span>
-                        </div>
-                    </div>
-                    <div class="testimonial-rating">
-                        ⭐⭐⭐⭐⭐
-                        <span class="rating-text">5.0</span>
-                    </div>
-                </div>
-
-                <div class="testimonial-card animate-fade-in-up animation-delay-600 glass-card interactive-card">
-                    <div class="testimonial-quote floating-element">❝</div>
-                    <p class="testimonial-text">"For our anniversary, we rented the Porsche 911 Carrera. The car was stunning, and the surprise upgrade to a convertible made it magical. City Drive made our special day even more memorable. Highly recommend!"</p>
-                    <div class="testimonial-header">
-                        <img src="assets/testimonial_image_1.png" alt="Elena Rodriguez" class="testimonial-avatar magnetic">
-                        <div class="testimonial-info">
-                            <h4 class="text-gradient">Elena Rodriguez</h4>
-                            <span>Marketing Director • Miami</span>
-                        </div>
-                    </div>
-                    <div class="testimonial-rating">
-                        ⭐⭐⭐⭐⭐
-                        <span class="rating-text">5.0</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="testimonial-stats">
-                <div class="stat-item">
-                    <div class="stat-number">98%</div>
-                    <div class="stat-label">Customer Satisfaction</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">4.9/5</div>
-                    <div class="stat-label">Average Rating</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">50K+</div>
-                    <div class="stat-label">Happy Customers</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Newsletter Section -->
-    <section class="newsletter-section">
-        <div class="newsletter-container">
-            <div class="newsletter-content">
-                <div class="newsletter-badge">🎁 Exclusive Access</div>
-                <h2 class="newsletter-title">Get VIP Treatment</h2>
-                <p class="newsletter-subtitle">Be the first to know about new luxury arrivals, exclusive member pricing, and special events</p>
-
-                <div class="newsletter-benefits">
-                    <div class="benefit-item">
-                        <span class="benefit-icon">🚗</span>
-                        <span>Early access to new vehicles</span>
-                    </div>
-                    <div class="benefit-item">
-                        <span class="benefit-icon">💰</span>
-                        <span>Exclusive member discounts</span>
-                    </div>
-                    <div class="benefit-item">
-                        <span class="benefit-icon">🎉</span>
-                        <span>VIP event invitations</span>
-                    </div>
-                </div>
-
-                <form class="newsletter-form" onsubmit="handleNewsletterSubmit(event)">
-                    <div class="form-row">
-                        <input type="text" placeholder="First name" class="newsletter-input">
-                        <input type="email" placeholder="Your email address" class="newsletter-input" required>
-                        <button type="submit" class="btn-primary">
-                            <span class="btn-text">Join VIP Club</span>
-                            <span class="btn-arrow">→</span>
-                        </button>
-                    </div>
-                </form>
-
-                <div class="newsletter-footer">
-                    <p class="newsletter-note">🔒 Your privacy is protected. Unsubscribe anytime.</p>
-                    <div class="subscriber-count">
-                        <span class="count-number">15,000+</span>
-                        <span class="count-label">Luxury Enthusiasts</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Final CTA Section -->
-    <section class="final-cta-section">
-        <div class="container">
-            <div class="final-cta-content glass-card animate-fade-in-up">
-                <h2 class="final-cta-title text-gradient">Ready to Experience Luxury?</h2>
-                <p class="final-cta-subtitle">Join thousands of satisfied customers who choose City Drive for their premium car rental needs</p>
-                <div class="final-cta-buttons">
-                    <button onclick="document.getElementById('pickup-location').focus()" class="btn-primary-large btn-premium">
-                        <span class="btn-icon floating-element">🚗</span>
-                        Book Your Car Now
-                        <div class="shimmer"></div>
-                    </button>
-                    <button onclick="showSignupModal()" class="btn-secondary-large glass-button">
-                        <span class="btn-icon floating-element">📱</span>
-                        Create Free Account
-                    </button>
-                </div>
-                <div class="final-cta-features">
-                    <div class="cta-feature animate-fade-in-up animation-delay-300">
-                        <span class="feature-check glow">✓</span>
-                        <span>Free cancellation up to 24 hours</span>
-                    </div>
-                    <div class="cta-feature animate-fade-in-up animation-delay-600">
-                        <span class="feature-check glow">✓</span>
-                        <span>No hidden fees or charges</span>
-                    </div>
-                    <div class="cta-feature animate-fade-in-up animation-delay-900">
-                        <span class="feature-check glow">✓</span>
-                        <span>24/7 customer support</span>
-                    </div>
+                <div class="contact-cta">
+                    <button onclick="window.location.href='contact.html'" class="btn-primary">Contact Us</button>
                 </div>
             </div>
         </div>
@@ -2548,7 +2045,7 @@
                     <li><a href="#home">Home</a></li>
                     <li><a href="cars.html">Cars</a></li>
                     <li><a href="my-bookings.html">My Bookings</a></li>
-                    <li><a href="#about">About</a></li>
+                    <li><a href="about.html">About</a></li>
                     <li><a href="contact.html">Contact</a></li>
                 </ul>
             </div>
@@ -2567,8 +2064,8 @@
                 <h4>Support</h4>
                 <ul>
                     <li><a href="#">Help Center</a></li>
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
                     <li><a href="#">Contact Us</a></li>
                 </ul>
             </div>

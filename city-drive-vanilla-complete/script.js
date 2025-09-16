@@ -329,7 +329,30 @@ function handleBookingSubmit(e) {
     const days = Math.ceil((returnD - pickup) / (1000 * 60 * 60 * 24));
     const estimatedPrice = days * 150; // $150 per day average
 
-    alert(`Booking request submitted!\n\nLocation: ${pickupLocation}\nPickup: ${pickupDate}\nReturn: ${returnDate}\nDuration: ${days} days\nEstimated Price: $${estimatedPrice}\n\nWe'll contact you shortly with confirmation.`);
+    // Create booking object
+    const booking = {
+        carName: 'General Booking',
+        pickupLocation: pickupLocation,
+        pickupDate: pickupDate,
+        returnDate: returnDate,
+        duration: days,
+        status: 'pending',
+        totalPrice: estimatedPrice,
+        bookingDate: new Date().toLocaleDateString(),
+        image: 'assets/main_car.png'
+    };
+
+    // Save booking
+    userBookings.push(booking);
+    localStorage.setItem('userBookings', JSON.stringify(userBookings));
+
+    // Update stats
+    bookingStats.totalBookings += 1;
+    bookingStats.totalSpent += estimatedPrice;
+    localStorage.setItem('bookingStats', JSON.stringify(bookingStats));
+    updateBookingStats();
+
+    alert(`Booking submitted successfully!\n\nLocation: ${pickupLocation}\nPickup: ${pickupDate}\nReturn: ${returnDate}\nDuration: ${days} days\nEstimated Price: $${estimatedPrice}\n\nCheck "My Bookings" to view your booking status.`);
 
     // Reset form
     e.target.reset();
@@ -388,7 +411,7 @@ function navigateTo(page) {
             document.getElementById('featured-section')?.scrollIntoView({ behavior: 'smooth' });
             break;
         case 'my-bookings':
-            document.getElementById('my-bookings')?.scrollIntoView({ behavior: 'smooth' });
+            window.location.href = 'my-bookings.html';
             break;
         case 'about':
             alert('About page coming soon!');
@@ -438,6 +461,7 @@ function getCarImage(carName) {
 // Load user bookings
 function loadUserBookings() {
     const bookingsList = document.getElementById('bookings-list');
+    if (!bookingsList) return;
 
     if (userBookings.length === 0) {
         bookingsList.innerHTML = `
@@ -478,9 +502,14 @@ function loadUserBookings() {
 
 // Update booking statistics
 function updateBookingStats() {
-    document.getElementById('total-bookings').textContent = bookingStats.totalBookings;
-    document.getElementById('total-spent').textContent = `$${bookingStats.totalSpent}`;
-    document.getElementById('avg-rating').textContent = bookingStats.avgRating.toFixed(1);
+    const totalBookingsEl = document.getElementById('total-bookings');
+    if (totalBookingsEl) totalBookingsEl.textContent = bookingStats.totalBookings;
+
+    const totalSpentEl = document.getElementById('total-spent');
+    if (totalSpentEl) totalSpentEl.textContent = `$${bookingStats.totalSpent}`;
+
+    const avgRatingEl = document.getElementById('avg-rating');
+    if (avgRatingEl) avgRatingEl.textContent = bookingStats.avgRating.toFixed(1);
 }
 
 // Car Search and Filter Functionality
