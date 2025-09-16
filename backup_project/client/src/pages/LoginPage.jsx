@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
-import { authAPI, setAuthToken } from '../utils/api';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { login, signup, loginWithGoogle } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
@@ -86,36 +87,15 @@ const LoginPage = () => {
     try {
       if (isLogin) {
         // Login
-        const response = await authAPI.login({
-          email: formData.email,
-          password: formData.password,
-        });
+        await login(formData.email, formData.password);
 
-        // Store token and user data
-        setAuthToken(response.token);
-        localStorage.setItem('user', JSON.stringify(response.user));
-
-        // Redirect based on role
-        if (response.user.role === 'owner' || response.user.role === 'admin') {
-          navigate('/owner');
-        } else {
-          navigate('/');
-        }
+        // Redirect will happen automatically via AuthContext
+        navigate('/');
       } else {
         // Register
-        const response = await authAPI.register({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          password: formData.password,
-          phone: formData.phone,
-        });
+        await signup(formData.email, formData.password, `${formData.firstName} ${formData.lastName}`);
 
-        // Store token and user data
-        setAuthToken(response.token);
-        localStorage.setItem('user', JSON.stringify(response.user));
-
-        // Redirect to home
+        // Redirect will happen automatically via AuthContext
         navigate('/');
       }
     } catch (error) {
@@ -130,46 +110,17 @@ const LoginPage = () => {
   const handleSocialLogin = async (provider) => {
     if (provider === 'Google') {
       try {
-        // Initialize Google Sign-In
-        if (!window.google) {
-          alert('Google Sign-In not loaded. Please check your internet connection.');
-          return;
-        }
-
-        const auth = window.google.accounts.oauth2.initTokenClient({
-          client_id: '572140120355-v14qb7j31oqjmacba895uho0a2jouiqt.apps.googleusercontent.com',
-          scope: 'openid email profile',
-          callback: async (response) => {
-            if (response.access_token) {
-              try {
-                setIsLoading(true);
-                const authResponse = await authAPI.googleLogin(response.access_token);
-                setAuthToken(authResponse.token);
-                localStorage.setItem('user', JSON.stringify(authResponse.user));
-
-                // Redirect based on role
-                if (authResponse.user.role === 'owner' || authResponse.user.role === 'admin') {
-                  navigate('/owner');
-                } else {
-                  navigate('/');
-                }
-              } catch (error) {
-                setErrors({
-                  submit: error.message || 'Google login failed'
-                });
-              } finally {
-                setIsLoading(false);
-              }
-            }
-          },
-        });
-
-        auth.requestAccessToken();
+        setIsLoading(true);
+        await loginWithGoogle();
+        // Redirect will happen automatically via AuthContext
+        navigate('/');
       } catch (error) {
         console.error('Google login error:', error);
         setErrors({
-          submit: 'Google login failed. Please try again.'
+          submit: error.message || 'Google login failed. Please try again.'
         });
+      } finally {
+        setIsLoading(false);
       }
     } else {
       // Facebook login (placeholder)
