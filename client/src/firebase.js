@@ -4,15 +4,15 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getAnalytics } from 'firebase/analytics';
 
-// Firebase configuration using environment variables
+// Firebase configuration for City Drive
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  apiKey: "AIzaSyBf-ZFhG8tesNnulOqO_zppcU5wC9pj6MM",
+  authDomain: "city-drive-953c0.firebaseapp.com",
+  projectId: "city-drive-953c0",
+  storageBucket: "city-drive-953c0.firebasestorage.app",
+  messagingSenderId: "83138806155",
+  appId: "1:83138806155:web:e7d967dbeddee9e47daf8e",
+  measurementId: "G-RB3LNG1J3K"
 };
 
 // Initialize Firebase
