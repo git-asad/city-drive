@@ -1,0 +1,21 @@
+{
+  "name": "city-drive",
+  "version": "1.0.0",
+  "description": "City Drive - Luxury Car Rental Application",
+  "main": "index.js",
+  "scripts": {
+    "build": "cd client && npm run build",
+    "dev": "cd client && npm run dev",
+    "start": "cd client && npm run preview"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "keywords": ["car-rental", "react", "nodejs", "mongodb"],
+  "author": "",
+  "license": "ISC",
+  "workspaces": [
+    "client",
+    "api"
+  ]
+}

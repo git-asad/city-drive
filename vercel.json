@@ -3,8 +3,14 @@
   "outputDirectory": "client/dist",
   "framework": null,
   "functions": {
-    "api/server.js": {
+    "api/**/*.js": {
       "runtime": "nodejs18.x"
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/server"
+    }
+  ]
 }
