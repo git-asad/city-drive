@@ -78,7 +78,7 @@ const Hero = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className='flex flex-col md:flex-row items-center justify-center p-6 md:p-8 rounded-2xl md:rounded-full w-full max-w-5xl bg-white/95 shadow-2xl mx-auto border border-white/20 backdrop-blur-lg animate-fade-in-up animation-delay-400'>
+      <form onSubmit={handleSubmit} className='flex flex-col md:flex-row items-center justify-center p-6 md:p-8 rounded-2xl md:rounded-full w-full max-w-5xl bg-white/98 shadow-2xl mx-auto border-2 border-white/30 backdrop-blur-lg animate-fade-in-up animation-delay-400'>
         <div className='flex flex-col md:flex-row items-center gap-4 md:gap-6 w-full'>
           {/* Pickup Location */}
           <div className='flex flex-col items-start gap-2 flex-1 min-w-0'>
@@ -132,7 +132,7 @@ const Hero = () => {
           </div>
           {/* Search Button */}
           <div className='flex justify-center md:justify-end flex-1 md:flex-none'>
-            <button type="submit" className='flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-gray-900 rounded-full cursor-pointer shadow-lg hover:shadow-xl transition-all font-bold font-[Montserrat] transform hover:scale-105'>
+            <button type="submit" className='flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white rounded-full cursor-pointer shadow-xl hover:shadow-2xl transition-all font-bold font-[Montserrat] transform hover:scale-105 border-2 border-white/20'>
               <img src={assets.search_icon} alt="" className='w-5 h-5'/>
               Search Cars
             </button>
@@ -145,19 +145,19 @@ const Hero = () => {
         <img src={assets.main_car} alt="luxury car" className='max-h-80 md:max-h-96 mx-auto drop-shadow-2xl animate-fade-in-up animation-delay-600' />
 
         {/* Floating Stats */}
-        <div className='absolute -top-8 -left-8 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl animate-bounce-in animation-delay-800'>
-          <div className='text-2xl font-bold text-blue-600'>50+</div>
-          <div className='text-sm text-gray-600'>Car Available</div>
+        <div className='absolute -top-8 -left-8 bg-white/98 backdrop-blur-sm rounded-2xl p-4 shadow-2xl border-2 border-white/30 animate-bounce-in animation-delay-800'>
+          <div className='text-2xl font-bold text-blue-700'>50+</div>
+          <div className='text-sm text-gray-700 font-semibold'>Car Available</div>
         </div>
 
-        <div className='absolute -top-8 -right-8 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl animate-bounce-in animation-delay-1000'>
-          <div className='text-2xl font-bold text-green-600'>5K+</div>
-          <div className='text-sm text-gray-600'>Happy Customer</div>
+        <div className='absolute -top-8 -right-8 bg-white/98 backdrop-blur-sm rounded-2xl p-4 shadow-2xl border-2 border-white/30 animate-bounce-in animation-delay-1000'>
+          <div className='text-2xl font-bold text-green-700'>5K+</div>
+          <div className='text-sm text-gray-700 font-semibold'>Happy Customer</div>
         </div>
 
-        <div className='absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl animate-bounce-in animation-delay-1200'>
-          <div className='text-2xl font-bold text-purple-600'>4.9★</div>
-          <div className='text-sm text-gray-600'>Average Rating</div>
+        <div className='absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white/98 backdrop-blur-sm rounded-2xl p-4 shadow-2xl border-2 border-white/30 animate-bounce-in animation-delay-1200'>
+          <div className='text-2xl font-bold text-purple-700'>4.9★</div>
+          <div className='text-sm text-gray-700 font-semibold'>Average Rating</div>
         </div>
       </div>
 
