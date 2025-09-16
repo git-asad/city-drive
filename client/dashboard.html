@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - City Drive</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="assets/logo.svg" alt="City Drive">
+            </div>
+            <div class="nav-auth">
+                <span id="user-greeting"></span>
+                <button onclick="logout()" class="btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <section class="dashboard">
+        <div class="welcome">
+            <h1 id="welcome-title">Welcome back!</h1>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <i class="fas fa-calendar-check"></i>
+                <h3>Total Bookings</h3>
+                <p id="total-bookings">0</p>
+            </div>
+            <div class="summary-card">
+                <i class="fas fa-dollar-sign"></i>
+                <h3>Total Amount Spent</h3>
+                <p id="total-spent">$0</p>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="quick-links">
+            <div class="link-card">
+                <i class="fas fa-car"></i>
+                <h3>Browse Cars</h3>
+                <button onclick="window.location.href='cars.html'" class="btn btn-primary">Browse Cars</button>
+            </div>
+            <div class="link-card">
+                <i class="fas fa-list"></i>
+                <h3>My Bookings</h3>
+                <button onclick="window.location.href='my-bookings.html'" class="btn btn-primary">My Bookings</button>
+            </div>
+            <div class="link-card">
+                <i class="fas fa-headset"></i>
+                <h3>Contact Support</h3>
+                <button onclick="window.location.href='contact.html'" class="btn btn-primary">Contact Support</button>
+            </div>
+            <div class="link-card">
+                <i class="fas fa-sign-out-alt"></i>
+                <h3>Logout</h3>
+                <button onclick="logout()" class="btn btn-primary">Logout</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Notification -->
+    <div id="notification" class="notification" style="display: none;"></div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="assets/js/script.js"></script>
+</body>
+</html>

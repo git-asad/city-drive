@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cars - City Drive</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="assets/logo.svg" alt="City Drive">
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="cars.html" class="nav-link active">Cars</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="nav-auth">
+                <button onclick="showLoginModal()" class="btn">Login</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cars Section -->
+    <section class="cars-section">
+        <h1>Available Cars</h1>
+
+        <!-- Find Car Box -->
+        <div class="find-car-box">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label>Pickup Date</label>
+                    <input type="date" id="pickup-date" class="filter-input" onchange="updateFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>Return Date</label>
+                    <input type="date" id="return-date" class="filter-input" onchange="updateFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>Car Type</label>
+                    <select id="car-type" class="filter-select" onchange="updateFilters()">
+                        <option value="">All Types</option>
+                        <option value="SUV">SUV</option>
+                        <option value="Sedan">Sedan</option>
+                        <option value="Luxury">Luxury</option>
+                        <option value="Sports">Sports</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Price Range</label>
+                    <select id="price-range" class="filter-select" onchange="updateFilters()">
+                        <option value="">All Prices</option>
+                        <option value="0-150">$0 - $150/day</option>
+                        <option value="150-250">$150 - $250/day</option>
+                        <option value="250-400">$250 - $400/day</option>
+                        <option value="400+">$400+/day</option>
+                    </select>
+                </div>
+            </div>
+            <button id="clear-filters" class="btn clear-filters" onclick="clearFilters()">Clear Filters</button>
+        </div>
+
+        <!-- Cars Grid -->
+        <div id="cars-grid" class="cars-grid">
+            <!-- Cars will be loaded here -->
+        </div>
+    </section>
+
+    <!-- Notification -->
+    <div id="notification" class="notification" style="display: none;"></div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="assets/js/script.js"></script>
+</body>
+</html>

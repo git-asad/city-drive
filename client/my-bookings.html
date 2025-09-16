@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - City Drive</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="assets/logo.svg" alt="City Drive">
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="cars.html" class="nav-link">Cars</a>
+                <a href="my-bookings.html" class="nav-link active">My Bookings</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="nav-auth">
+                <span id="user-greeting"></span>
+                <button onclick="logout()" class="btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Bookings Section -->
+    <section class="bookings-section">
+        <h1>My Bookings</h1>
+
+        <table class="bookings-table">
+            <thead>
+                <tr>
+                    <th>Car Image</th>
+                    <th>Name</th>
+                    <th>Pickup Date</th>
+                    <th>Return Date</th>
+                    <th>Total Cost</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="bookings-table-body">
+                <!-- Bookings will be loaded here -->
+            </tbody>
+        </table>
+
+        <div id="no-bookings" class="no-bookings" style="display: none;">
+            <div class="no-bookings-icon">📅</div>
+            <h3>No Bookings Yet</h3>
+            <p>You haven't made any bookings yet. Start exploring our premium fleet!</p>
+            <button onclick="window.location.href='cars.html'" class="btn">Browse Cars</button>
+        </div>
+    </section>
+
+    <!-- Notification -->
+    <div id="notification" class="notification" style="display: none;"></div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="assets/js/script.js"></script>
+</body>
+</html>

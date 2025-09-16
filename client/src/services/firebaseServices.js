@@ -21,7 +21,7 @@ export const carServices = {
   async getAllCars() {
     try {
       const carsRef = collection(db, 'cars');
-      const q = query(carsRef, where('available', '==', true));
+      const q = query(carsRef, where('availability', '==', true), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
 
       const cars = [];
@@ -29,7 +29,6 @@ export const carServices = {
         cars.push({ id: doc.id, ...doc.data() });
       });
 
-      console.log(`✅ Retrieved ${cars.length} available cars`);
       return cars;
     } catch (error) {
       console.error('❌ Error fetching cars:', error);
@@ -57,7 +56,7 @@ export const carServices = {
   async getOwnerCars(ownerId) {
     try {
       const carsRef = collection(db, 'cars');
-      const q = query(carsRef, where('ownerId', '==', ownerId));
+      const q = query(carsRef, where('ownerId', '==', ownerId), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
 
       const cars = [];
@@ -65,7 +64,6 @@ export const carServices = {
         cars.push({ id: doc.id, ...doc.data() });
       });
 
-      console.log(`✅ Retrieved ${cars.length} owner cars`);
       return cars;
     } catch (error) {
       console.error('❌ Error fetching owner cars:', error);
@@ -77,15 +75,25 @@ export const carServices = {
   async addCar(carData, ownerId) {
     try {
       const carDoc = {
-        ...carData,
+        name: carData.name,
+        brand: carData.brand,
+        model: carData.model,
+        description: carData.description,
+        pricePerDay: carData.pricePerDay,
+        availability: true,
+        imageURL: carData.imageURL,
         ownerId: ownerId,
-        available: true,
+        category: carData.category,
+        year: carData.year,
+        seatingCapacity: carData.seatingCapacity,
+        fuelType: carData.fuelType,
+        transmission: carData.transmission,
+        location: carData.location,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
       };
 
       const docRef = await addDoc(collection(db, 'cars'), carDoc);
-      console.log('✅ Car added with ID:', docRef.id);
       return { id: docRef.id, ...carDoc };
     } catch (error) {
       console.error('❌ Error adding car:', error);
@@ -102,7 +110,6 @@ export const carServices = {
         updatedAt: Timestamp.now()
       });
 
-      console.log('✅ Car updated:', carId);
       return { id: carId, ...carData };
     } catch (error) {
       console.error('❌ Error updating car:', error);
@@ -114,7 +121,6 @@ export const carServices = {
   async deleteCar(carId) {
     try {
       await deleteDoc(doc(db, 'cars', carId));
-      console.log('✅ Car deleted:', carId);
       return true;
     } catch (error) {
       console.error('❌ Error deleting car:', error);
@@ -131,7 +137,7 @@ export const bookingServices = {
       const bookingsRef = collection(db, 'bookings');
       const q = query(
         bookingsRef,
-        where('userId', '==', userId),
+        where('clientId', '==', userId),
         orderBy('createdAt', 'desc')
       );
       const querySnapshot = await getDocs(q);
@@ -142,13 +148,12 @@ export const bookingServices = {
         bookings.push({
           id: doc.id,
           ...data,
-          startDate: data.startDate?.toDate?.() || data.startDate,
-          endDate: data.endDate?.toDate?.() || data.endDate,
+          pickupDate: data.pickupDate?.toDate?.() || data.pickupDate,
+          returnDate: data.returnDate?.toDate?.() || data.returnDate,
           createdAt: data.createdAt?.toDate?.() || data.createdAt
         });
       });
 
-      console.log(`✅ Retrieved ${bookings.length} user bookings`);
       return bookings;
     } catch (error) {
       console.error('❌ Error fetching user bookings:', error);
@@ -159,7 +164,8 @@ export const bookingServices = {
   // Get all bookings (for owners)
   async getAllBookings() {
     try {
-      const querySnapshot = await getDocs(collection(db, 'bookings'));
+      const q = query(collection(db, 'bookings'), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
 
       const bookings = [];
       querySnapshot.forEach((doc) => {
@@ -167,13 +173,12 @@ export const bookingServices = {
         bookings.push({
           id: doc.id,
           ...data,
-          startDate: data.startDate?.toDate?.() || data.startDate,
-          endDate: data.endDate?.toDate?.() || data.endDate,
+          pickupDate: data.pickupDate?.toDate?.() || data.pickupDate,
+          returnDate: data.returnDate?.toDate?.() || data.returnDate,
           createdAt: data.createdAt?.toDate?.() || data.createdAt
         });
       });
 
-      console.log(`✅ Retrieved ${bookings.length} bookings`);
       return bookings;
     } catch (error) {
       console.error('❌ Error fetching bookings:', error);
@@ -186,30 +191,29 @@ export const bookingServices = {
     try {
       // Get car details to calculate price
       const car = await carServices.getCarById(bookingData.carId);
-      const startDate = new Date(bookingData.startDate);
-      const endDate = new Date(bookingData.endDate);
+      const startDate = new Date(bookingData.pickupDate);
+      const endDate = new Date(bookingData.returnDate);
       const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
       const totalPrice = days * car.pricePerDay;
 
       const bookingDoc = {
-        userId: userId,
+        clientId: userId,
         carId: bookingData.carId,
-        carName: `${car.name} ${car.model}`,
-        startDate: Timestamp.fromDate(startDate),
-        endDate: Timestamp.fromDate(endDate),
+        pickupDate: Timestamp.fromDate(startDate),
+        returnDate: Timestamp.fromDate(endDate),
         totalPrice: totalPrice,
         status: 'pending',
-        createdAt: Timestamp.now()
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
       };
 
       const docRef = await addDoc(collection(db, 'bookings'), bookingDoc);
-      console.log('✅ Booking created with ID:', docRef.id);
 
       return {
         id: docRef.id,
         ...bookingDoc,
-        startDate: startDate,
-        endDate: endDate,
+        pickupDate: startDate,
+        returnDate: endDate,
         createdAt: new Date()
       };
     } catch (error) {
@@ -219,15 +223,37 @@ export const bookingServices = {
   },
 
   // Update booking status
-  async updateBookingStatus(bookingId, status) {
+  async updateBookingStatus(bookingId, status, ownerId = null) {
     try {
       const bookingRef = doc(db, 'bookings', bookingId);
-      await updateDoc(bookingRef, {
+      const updateData = {
         status: status,
         updatedAt: Timestamp.now()
-      });
+      };
 
-      console.log(`✅ Booking ${bookingId} status updated to ${status}`);
+      // If accepting booking, add acceptedAt timestamp
+      if (status === 'confirmed') {
+        updateData.acceptedAt = Timestamp.now();
+      }
+
+      await updateDoc(bookingRef, updateData);
+
+      // If booking is accepted and we have ownerId, create revenue record
+      if (status === 'confirmed' && ownerId) {
+        try {
+          // Get the booking details to create revenue record
+          const bookingDoc = await getDoc(bookingRef);
+          if (bookingDoc.exists()) {
+            const bookingData = { id: bookingDoc.id, ...bookingDoc.data() };
+            await revenueServices.createRevenueRecord(bookingData, ownerId);
+            console.log('💰 Revenue record created for accepted booking');
+          }
+        } catch (revenueError) {
+          console.error('❌ Error creating revenue record:', revenueError);
+          // Don't fail the booking update if revenue creation fails
+        }
+      }
+
       return true;
     } catch (error) {
       console.error('❌ Error updating booking status:', error);
@@ -260,7 +286,6 @@ export const reviewServices = {
         });
       });
 
-      console.log(`✅ Retrieved ${reviews.length} reviews for car ${carId}`);
       return reviews;
     } catch (error) {
       console.error('❌ Error fetching reviews:', error);
@@ -280,10 +305,68 @@ export const reviewServices = {
       };
 
       const docRef = await addDoc(collection(db, 'reviews'), reviewDoc);
-      console.log('✅ Review added with ID:', docRef.id);
       return { id: docRef.id, ...reviewDoc };
     } catch (error) {
       console.error('❌ Error adding review:', error);
+      throw error;
+    }
+  }
+};
+
+// Revenue Services
+export const revenueServices = {
+  // Get owner's revenue records
+  async getOwnerRevenue(ownerId) {
+    try {
+      const revenueRef = collection(db, 'revenue');
+      const q = query(revenueRef, where('ownerId', '==', ownerId), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+
+      const revenues = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        revenues.push({
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate?.() || data.createdAt
+        });
+      });
+
+      return revenues;
+    } catch (error) {
+      console.error('❌ Error fetching owner revenue:', error);
+      throw error;
+    }
+  },
+
+  // Create revenue record when booking is accepted
+  async createRevenueRecord(bookingData, ownerId) {
+    try {
+      const revenueDoc = {
+        ownerId: ownerId,
+        bookingId: bookingData.id,
+        carId: bookingData.carId,
+        clientId: bookingData.clientId,
+        amount: bookingData.totalPrice,
+        description: `Revenue from booking: ${bookingData.carName || 'Car rental'}`,
+        createdAt: Timestamp.now()
+      };
+
+      const docRef = await addDoc(collection(db, 'revenue'), revenueDoc);
+      return { id: docRef.id, ...revenueDoc };
+    } catch (error) {
+      console.error('❌ Error creating revenue record:', error);
+      throw error;
+    }
+  },
+
+  // Get total revenue for owner
+  async getTotalRevenue(ownerId) {
+    try {
+      const revenues = await this.getOwnerRevenue(ownerId);
+      return revenues.reduce((total, revenue) => total + (revenue.amount || 0), 0);
+    } catch (error) {
+      console.error('❌ Error calculating total revenue:', error);
       throw error;
     }
   }

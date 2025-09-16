@@ -1,114 +1,87 @@
 import React, { useState, useEffect } from 'react';
-import { dummyDashboardData, assets, ownerMenuLinks, dummyUserData, dummyCarData } from '../assets/assets';
+import { assets, ownerMenuLinks } from '../assets/assets';
 import { useNavigate } from 'react-router-dom';
-import { loadAllBookings, updateBookingStatus } from '../utils/bookingStorage';
+import { bookingServices, carServices, revenueServices } from '../services/firebaseServices';
+import { useAuth } from '../context/AuthContext';
+import LoadingSpinner from '../Components/LoadingSpinner';
 
 const OwnerDashboard = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [bookings, setBookings] = useState([]);
+  const [cars, setCars] = useState([]);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Clear customer bookings on component mount
   useEffect(() => {
-    localStorage.removeItem('customerBookings');
-  }, []);
+    const loadDashboardData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-  // Calculate dynamic total cars (dummy data + added cars from localStorage)
-  const getTotalCars = () => {
-    const addedCars = JSON.parse(localStorage.getItem('addedCars') || '[]');
-    return dummyCarData.length + addedCars.length;
-  };
+        // Load all data from Firebase
+        console.log('📊 Loading dashboard data for owner...');
+        const [allBookings, ownerCars, revenue] = await Promise.all([
+          bookingServices.getAllBookings(),
+          carServices.getOwnerCars(user.id),
+          revenueServices.getTotalRevenue(user.id)
+        ]);
 
-  // Get only visible cars for featured section
-  const getFeaturedCars = () => {
-    const addedCars = JSON.parse(localStorage.getItem('addedCars') || '[]');
-    const dummyVisibility = JSON.parse(localStorage.getItem('dummyCarVisibility') || '{}');
+        // Filter bookings to only show those for owner's cars
+        const ownerBookings = allBookings.filter(booking =>
+          ownerCars.some(car => car.id === booking.carId)
+        );
 
-    // Add visibility status to dummy cars
-    const dummyCarsWithVisibility = dummyCarData.map(car => ({
-      ...car,
-      isVisible: dummyVisibility[car._id] !== false // Default to true if not set
-    }));
+        console.log(`✅ Owner loaded ${ownerBookings.length} bookings, ${ownerCars.length} cars, $${revenue} revenue`);
+        setBookings(ownerBookings);
+        setCars(ownerCars);
+        setTotalRevenue(revenue);
 
-    const allCars = [...dummyCarsWithVisibility, ...addedCars];
-    return allCars.filter(car => car.isVisible !== false).slice(0, 4);
-  };
+      } catch (err) {
+        console.error('❌ Error loading dashboard data:', err);
+        setError('Failed to load dashboard data. Please refresh the page or contact support.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Calculate dynamic statistics using centralized booking storage
-  const getMonthlyRevenue = () => {
-    const allBookings = loadAllBookings();
-    // Calculate revenue from confirmed bookings only (exclude canceled bookings)
-    const activeBookings = allBookings.filter(booking =>
-      booking.status === 'confirmed' &&
-      booking.status !== 'canceled_by_owner' &&
-      booking.status !== 'cancelled'
-    );
-    const totalRevenue = activeBookings.reduce((sum, booking) => {
-      const price = parseFloat(booking.price) || 0;
-      console.log(`📊 Adding booking ${booking._id}: $${price.toFixed(2)} (${booking.status})`);
-      return sum + price;
-    }, 0);
-
-    console.log(`💰 Total monthly revenue calculated: $${totalRevenue.toFixed(2)} from ${activeBookings.length} active bookings`);
-    return totalRevenue;
-  };
-
-  const getTotalBookings = () => {
-    // Get total bookings counter from localStorage (starts at 2)
-    const totalBookingsCounter = parseInt(localStorage.getItem('totalBookingsCounter') || '2');
-    return totalBookingsCounter;
-  };
+    if (user?.id) {
+      loadDashboardData();
+    }
+  }, [user]);
 
   const getPendingBookings = () => {
-    const allBookings = loadAllBookings();
-    return allBookings.filter(booking => booking.status === 'pending').length;
+    return bookings.filter(booking => booking.status === 'pending').length;
   };
 
   const getConfirmedBookings = () => {
-    const allBookings = loadAllBookings();
-    return allBookings.filter(booking => booking.status === 'confirmed').length;
+    return bookings.filter(booking => booking.status === 'confirmed').length;
   };
 
-  const featuredCars = getFeaturedCars();
+  const featuredCars = cars.slice(0, 4);
 
 
-  const acceptBooking = (bookingId) => {
+  const acceptBooking = async (bookingId) => {
     try {
-      // Use centralized booking storage system
-      const result = updateBookingStatus(bookingId, 'confirmed');
+      // Use Firebase booking service
+      await bookingServices.updateBookingStatus(bookingId, 'confirmed', user.id);
 
-      if (result.success) {
-        // Calculate the revenue that was just added
-        const allBookings = loadAllBookings();
-        const confirmedBooking = allBookings.find(booking => booking._id === bookingId);
-
-        if (confirmedBooking) {
-          const addedRevenue = confirmedBooking.price || 0;
-          console.log(`💰 Booking confirmed! Added $${addedRevenue.toFixed(2)} to monthly revenue`);
-        }
-
-        alert('Booking accepted successfully! Revenue has been added to your dashboard.');
-        window.location.reload(); // Refresh to show updated status and revenue
-      } else {
-        console.error('Error accepting booking:', result.message);
-        alert(`Failed to accept booking: ${result.message}`);
-      }
+      alert('Booking accepted successfully! Revenue has been added to your dashboard.');
+      window.location.reload(); // Refresh to show updated status and revenue
     } catch (error) {
       console.error('Error accepting booking:', error);
       alert('Failed to accept booking. Please try again.');
     }
   };
 
-  const rejectBooking = (bookingId) => {
+  const rejectBooking = async (bookingId) => {
     try {
-      // Use centralized booking storage system
-      const result = updateBookingStatus(bookingId, 'cancelled');
+      // Use Firebase booking service
+      await bookingServices.updateBookingStatus(bookingId, 'cancelled', user.id);
 
-      if (result.success) {
-        alert('Booking rejected.');
-        window.location.reload(); // Refresh to show updated status
-      } else {
-        console.error('Error rejecting booking:', result.message);
-        alert(`Failed to reject booking: ${result.message}`);
-      }
+      alert('Booking rejected.');
+      window.location.reload(); // Refresh to show updated status
     } catch (error) {
       console.error('Error rejecting booking:', error);
       alert('Failed to reject booking. Please try again.');
@@ -118,14 +91,14 @@ const OwnerDashboard = () => {
   const stats = [
     {
       title: 'Total Cars',
-      value: getTotalCars(),
+      value: cars.length,
       icon: assets.carIcon,
       color: 'from-blue-500 to-blue-600',
       bgColor: 'bg-blue-50'
     },
     {
       title: 'Total Bookings',
-      value: getTotalBookings(),
+      value: bookings.length,
       icon: assets.listIcon,
       color: 'from-green-500 to-green-600',
       bgColor: 'bg-green-50'
@@ -160,6 +133,37 @@ const OwnerDashboard = () => {
       currency: 'USD'
     }).format(amount);
   };
+
+  if (loading) {
+    return (
+      <div className='flex min-h-screen bg-gray-50'>
+        <div className='w-64 bg-white shadow-lg'></div>
+        <div className='flex-1 p-8 flex items-center justify-center'>
+          <LoadingSpinner />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className='flex min-h-screen bg-gray-50'>
+        <div className='w-64 bg-white shadow-lg'></div>
+        <div className='flex-1 p-8 flex items-center justify-center'>
+          <div className='text-center'>
+            <h2 className='text-xl font-bold text-red-600 mb-2'>Error</h2>
+            <p>{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className='mt-4 px-4 py-2 bg-blue-600 text-white rounded'
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='flex min-h-screen bg-gray-50'>
@@ -209,15 +213,15 @@ const OwnerDashboard = () => {
           <p className='text-gray-600'>Welcome back! Here's what's happening with your cars.</p>
         </div>
 
-          {/* Monthly Revenue */}
+          {/* Total Revenue */}
           <div className='bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-8 text-white mb-8 shadow-lg'>
             <div className='flex items-center justify-between'>
               <div>
-                <h2 className='text-2xl font-bold mb-2'>Monthly Revenue</h2>
-                <p className='text-green-100'>Current month earnings</p>
+                <h2 className='text-2xl font-bold mb-2'>Total Revenue</h2>
+                <p className='text-green-100'>All-time earnings from confirmed bookings</p>
               </div>
               <div className='text-right'>
-                <div className='text-4xl font-bold'>{formatCurrency(getMonthlyRevenue())}</div>
+                <div className='text-4xl font-bold'>{formatCurrency(totalRevenue)}</div>
                 <div className='text-green-100 text-sm'>+12% from last month</div>
               </div>
             </div>
@@ -250,9 +254,7 @@ const OwnerDashboard = () => {
 
             <div className='divide-y divide-gray-200'>
               {(() => {
-                // Use centralized booking storage system
-                const allBookings = loadAllBookings();
-                const recentBookings = allBookings.slice(-5).reverse(); // Get last 5 bookings, most recent first
+                const recentBookings = bookings.slice(-5).reverse(); // Get last 5 bookings, most recent first
 
                 if (recentBookings.length === 0) {
                   return (
@@ -263,46 +265,33 @@ const OwnerDashboard = () => {
                 }
 
                 return recentBookings.map((booking, index) => {
-                  // Find the car in our combined data (dummy + added cars)
-                  const addedCars = JSON.parse(localStorage.getItem('addedCars') || '[]');
-                  const dummyCarUpdates = JSON.parse(localStorage.getItem('dummyCarUpdates') || '{}');
-
-                  // Apply updates to dummy cars
-                  const dummyCarsWithUpdates = dummyCarData.map(car => ({
-                    ...car,
-                    ...dummyCarUpdates[car._id]
-                  }));
-
-                  const allCars = [...dummyCarsWithUpdates, ...addedCars];
-                  const carData = allCars.find(car => car._id === booking.car._id) || booking.car;
+                  const carData = cars.find(car => car.id === booking.carId) || {};
 
                   return (
-                    <div key={booking._id || index} className='p-6 hover:bg-gray-50 transition-colors'>
+                    <div key={booking.id || index} className='p-6 hover:bg-gray-50 transition-colors'>
                       <div className='flex items-center justify-between'>
                         <div className='flex items-center gap-4'>
                           <img
-                            src={carData.image}
-                            alt={carData.brand}
+                            src={carData.images?.[0] || carData.imageURL || carData.image || assets.main_car}
+                            alt={carData.brand || carData.name || 'Car'}
                             className='w-16 h-16 rounded-lg object-cover'
                           />
                           <div>
                             <h4 className='font-semibold text-gray-900'>
-                              {carData.brand} {carData.model}
+                              {carData.brand || carData.name || 'Car'} {carData.model || ''}
                             </h4>
                             <p className='text-gray-600 text-sm'>
                               {formatDate(booking.pickupDate)} - {formatDate(booking.returnDate)}
                             </p>
-                            <p className='text-gray-500 text-sm'>{booking.pickupLocation || carData.location}</p>
-                            {booking.customerInfo && (
-                              <p className='text-gray-500 text-xs mt-1'>
-                                Customer: {booking.customerInfo.firstName} {booking.customerInfo.lastName}
-                              </p>
-                            )}
+                            <p className='text-gray-500 text-sm'>{carData.location || 'Location not specified'}</p>
+                            <p className='text-gray-500 text-xs mt-1'>
+                              Customer: {booking.customerName || 'N/A'}
+                            </p>
                           </div>
                         </div>
 
                         <div className='text-right flex flex-col items-end gap-2'>
-                          <div className='font-bold text-gray-900'>{formatCurrency(booking.price)}</div>
+                          <div className='font-bold text-gray-900'>{formatCurrency(booking.totalPrice)}</div>
                           <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
                             booking.status === 'confirmed'
                               ? 'bg-green-100 text-green-800'
@@ -316,13 +305,13 @@ const OwnerDashboard = () => {
                           {booking.status === 'pending' && (
                             <div className='flex gap-2'>
                               <button
-                                onClick={() => acceptBooking(booking._id)}
+                                onClick={() => acceptBooking(booking.id)}
                                 className='px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors'
                               >
                                 Accept
                               </button>
                               <button
-                                onClick={() => rejectBooking(booking._id)}
+                                onClick={() => rejectBooking(booking.id)}
                                 className='px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors'
                               >
                                 Reject

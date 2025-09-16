@@ -95,15 +95,18 @@ export const menuLinks = [
     { name: "Cars", path: "/cars" },
     { name: "My Bookings", path: "/my-bookings" },
     { name: "Profile", path: "/profile" },
+    { name: "Contact", path: "/contact" },
+    { name: "About", path: "/about" },
     { name: "Dashboard", path: "/owner" },
     { name: "Login", path: "/login" },
 ]
 
 export const ownerMenuLinks = [
-    { name: "Dashboard", path: "/owner", icon: dashboardIcon, coloredIcon: dashboardIconColored },
-    { name: "Add car", path: "/owner/add-car", icon: addIcon, coloredIcon: addIconColored },
-    { name: "Manage Cars", path: "/owner/manage-cars", icon: carIcon, coloredIcon: carIconColored },
-    { name: "Manage Bookings", path: "/owner/manage-bookings", icon: listIcon, coloredIcon: listIconColored },
+  { name: "Dashboard", path: "/owner", icon: dashboardIcon, coloredIcon: dashboardIconColored },
+  { name: "Add car", path: "/owner/add-car", icon: addIcon, coloredIcon: addIconColored },
+  { name: "Manage Cars", path: "/owner/manage-cars", icon: carIcon, coloredIcon: carIconColored },
+  { name: "Manage Bookings", path: "/owner/manage-bookings", icon: listIcon, coloredIcon: listIconColored },
+  { name: "Revenue", path: "/owner/revenue", icon: listIcon, coloredIcon: listIconColored },
 ]
 
 export const dummyUserData = {

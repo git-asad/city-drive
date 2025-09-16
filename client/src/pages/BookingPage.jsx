@@ -48,7 +48,7 @@ const BookingPage = () => {
   // Check authentication
   useEffect(() => {
     if (!isAuthenticated()) {
-      navigate('/login');
+      navigate('/client-login');
       return;
     }
   }, [isAuthenticated, navigate]);
@@ -129,7 +129,7 @@ const BookingPage = () => {
     }
 
     const cleanPhone = bookingData.phone.replace(/[\s\-\(\)]/g, '');
-    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+    const phoneRegex = /^[+]?[1-9][\d]{0,15}$/;
     if (!phoneRegex.test(cleanPhone) || cleanPhone.length < 7) {
       alert('Please enter a valid phone number');
       return;
@@ -174,7 +174,7 @@ const BookingPage = () => {
         firstName: bookingData.firstName,
         lastName: bookingData.lastName,
         email: bookingData.email,
-        phone: bookingData.countryCode + bookingData.phone.replace(/[\s\-\(\)]/g, ''),
+        phone: bookingData.countryCode + bookingData.phone.replace(/[\s\-()]/g, ''),
         licenseNumber: bookingData.licenseNumber
       },
       pickupDate: bookingData.pickupDate,
@@ -226,40 +226,6 @@ const BookingPage = () => {
     const paymentStatus = bookingData.paymentType === 'deposit' ? 'deposit_paid' : 'paid';
 
     // Create booking with payment information
-    const newBooking = {
-      _id: Date.now().toString() + Math.random().toString(36).substr(2, 9), // Unique ID
-      car: bookingSummary.car,
-      userId: user?.id, // Keep for backward compatibility
-      userEmail: user?.email, // Use email for persistence
-      customerInfo: bookingSummary.customerInfo,
-      pickupDate: bookingSummary.pickupDate,
-      returnDate: bookingSummary.returnDate,
-      pickupLocation: bookingSummary.pickupLocation,
-      returnLocation: bookingSummary.returnLocation,
-      days: bookingSummary.days,
-      insurance: bookingSummary.insurance,
-      specialRequests: bookingSummary.specialRequests,
-      price: bookingSummary.totalPrice,
-      paymentInfo: {
-        method: bookingData.paymentMethod,
-        type: bookingData.paymentType,
-        amount: paymentAmount,
-        cardNumber: bookingData.paymentMethod === 'credit_card' ? '**** **** **** ' + bookingData.cardNumber.slice(-4) : null,
-        expiryMonth: bookingData.expiryMonth,
-        expiryYear: bookingData.expiryYear,
-        cardholderName: bookingData.cardholderName,
-        billingAddress: bookingData.billingAddress,
-        billingCity: bookingData.billingCity,
-        billingState: bookingData.billingState,
-        billingZipCode: bookingData.billingZipCode,
-        billingCountry: bookingData.billingCountry,
-        saveCard: bookingData.saveCard,
-        paidAt: new Date().toISOString()
-      },
-      status: 'pending', // Still pending owner confirmation
-      paymentStatus: paymentStatus, // 'paid' or 'deposit_paid'
-      createdAt: new Date().toISOString()
-    };
 
     try {
       // Create booking in Firebase

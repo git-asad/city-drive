@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { assets } from '../assets/assets'
-import { carAPI } from '../utils/api'
+import { carServices, reviewServices } from '../services/firebaseServices'
 import LoadingSpinner from '../Components/LoadingSpinner'
 import { useAuth } from '../context/AuthContext'
 
@@ -20,9 +20,13 @@ const CarDetails = () => {
           setLoading(true)
           setError(null)
 
-          const response = await carAPI.getById(id)
-          setCar(response.car)
-          setReviews(response.reviews || [])
+          // Fetch car details from Firebase
+          const carData = await carServices.getCarById(id)
+          setCar(carData)
+
+          // Fetch reviews for this car
+          const reviewsData = await reviewServices.getCarReviews(id)
+          setReviews(reviewsData)
         } catch (err) {
           console.error('Error fetching car details:', err)
           setError(err.message || 'Failed to load car details')
@@ -66,10 +70,10 @@ const CarDetails = () => {
     <div className='px-6 md:px-16 lg:px-24 xl:px-32 mt-16'>
       <div className='flex flex-col lg:flex-row gap-8'>
         <div className='flex-1'>
-          <img src={car.images?.[0] || car.image || assets.car_image1} alt={`${car.brand} ${car.model}`} className='w-full h-96 object-cover rounded-lg'/>
+          <img src={car.images?.[0] || car.imageURL || car.image || assets.car_image1} alt={`${car.brand || car.name} ${car.model}`} className='w-full h-96 object-cover rounded-lg'/>
         </div>
         <div className='flex-1'>
-          <h1 className='text-3xl font-bold mb-4'>{car.brand} {car.model} ({car.year})</h1>
+          <h1 className='text-3xl font-bold mb-4'>{car.brand || car.name} {car.model} ({car.year})</h1>
           <div className='grid grid-cols-2 gap-4 mb-6'>
             <div>
               <p className='text-gray-600'>Category</p>
@@ -77,11 +81,11 @@ const CarDetails = () => {
             </div>
             <div>
               <p className='text-gray-600'>Seating Capacity</p>
-              <p className='font-semibold'>{car.seating_capacity} seats</p>
+              <p className='font-semibold'>{car.seatingCapacity || car.seating_capacity} seats</p>
             </div>
             <div>
               <p className='text-gray-600'>Fuel Type</p>
-              <p className='font-semibold'>{car.fuel_type}</p>
+              <p className='font-semibold'>{car.fuelType || car.fuel_type}</p>
             </div>
             <div>
               <p className='text-gray-600'>Transmission</p>
@@ -104,15 +108,15 @@ const CarDetails = () => {
             onClick={() => {
               if (!isAuthenticated()) {
                 // Redirect to login with booking URL as return URL
-                navigate('/login', {
+                navigate('/client-login', {
                   state: {
-                    from: `/booking/${car._id}`,
+                    from: `/booking/${car.id}`,
                     message: 'You must sign in before booking a car.'
                   },
                   replace: true
                 });
               } else {
-                navigate(`/booking/${car._id}`);
+                navigate(`/booking/${car.id}`);
               }
             }}
             className='bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all'

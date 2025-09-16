@@ -27,7 +27,7 @@ const LoginPage = () => {
   }, [isAuthenticated, user, loading, navigate, location]);
 
   const getDefaultRoute = (role) => {
-    return role === 'owner' ? '/dashboard' : '/home';
+    return role === 'owner' ? '/owner' : '/';
   };
 
   const handleInputChange = (e) => {

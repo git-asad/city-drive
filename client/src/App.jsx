@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './Components/ProtectedRoute';
 import Navbar from './Components/Navbar';
 import CarDetails from './pages/CarDetails';
 import Home from './pages/Home';
@@ -9,108 +8,65 @@ import Cars from './pages/Cars';
 import MyBookings from './pages/MyBookings';
 import BookingPage from './pages/BookingPage';
 import LoginPage from './pages/LoginPage';
+import ClientLoginPage from './pages/ClientLoginPage';
+import OwnerLoginPage from './pages/OwnerLoginPage';
+import UserProfile from './pages/UserProfile';
 import OwnerDashboard from './pages/OwnerDashboard';
-import Settings from './pages/Settings';
 import EditCar from './pages/EditCar';
 import AddCar from './pages/AddCar';
 import ManageCars from './pages/ManageCars';
 import ManageBookings from './pages/ManageBookings';
+import Revenue from './pages/Revenue';
+import Settings from './pages/Settings';
+import Contact from './pages/Contact';
+import About from './pages/About';
+import TermsOfService from './pages/TermsOfService';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import NotFound from './pages/NotFound';
 import Footer from './Components/Footer';
-import { initializeBookingStorage } from './utils/bookingStorage';
+import ProtectedRoute from './Components/ProtectedRoute';
 
 const AppContent = () => {
-  const location = useLocation();
-  const isOwnerPath = location.pathname.startsWith('/owner') || location.pathname === '/dashboard';
-
-  // Initialize booking storage on app load
-  useEffect(() => {
-    initializeBookingStorage();
-  }, []);
+  const isOwnerpath = useLocation().pathname.startsWith('/owner');
 
   return (
     <>
       <Navbar />
 
       <Routes>
-        {/* Public Routes */}
-        <Route path='/login' element={
-          <ProtectedRoute requireAuth={false}>
-            <LoginPage />
-          </ProtectedRoute>
-        } />
-
-        {/* Protected Routes for All Authenticated Users */}
-        <Route path='/' element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        } />
-        <Route path='/home' element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        } />
-        <Route path='/car-details/:id' element={
-          <ProtectedRoute>
-            <CarDetails />
-          </ProtectedRoute>
-        } />
-        <Route path='/cars' element={
-          <ProtectedRoute>
-            <Cars />
-          </ProtectedRoute>
-        } />
-        <Route path='/booking/:id' element={
-          <ProtectedRoute>
-            <BookingPage />
-          </ProtectedRoute>
-        } />
-
-        {/* Customer Only Routes */}
-        <Route path='/my-bookings' element={
-          <ProtectedRoute allowedRoles={['customer']}>
-            <MyBookings />
-          </ProtectedRoute>
-        } />
-
-        {/* Owner Only Routes */}
-        <Route path='/dashboard' element={
-          <ProtectedRoute allowedRoles={['owner']}>
-            <OwnerDashboard />
-          </ProtectedRoute>
-        } />
+        <Route path='/' element={<Home />} />
+        <Route path='/car-details/:id' element={<CarDetails />} />
+        <Route path='/cars' element={<Cars />} />
+        <Route path='/booking/:id' element={<BookingPage />} />
+        <Route path='/login' element={<LoginPage />} />
+        <Route path='/client-login' element={<ClientLoginPage />} />
+        <Route path='/owner-login' element={<OwnerLoginPage />} />
+        <Route path='/profile' element={<UserProfile />} />
         <Route path='/settings' element={
-          <ProtectedRoute allowedRoles={['owner']}>
+          <ProtectedRoute>
             <Settings />
           </ProtectedRoute>
         } />
-        <Route path='/owner' element={
-          <ProtectedRoute allowedRoles={['owner']}>
-            <OwnerDashboard />
+        <Route path='/my-bookings' element={
+          <ProtectedRoute>
+            <MyBookings />
           </ProtectedRoute>
         } />
-        <Route path='/owner/edit-car/:id' element={
-          <ProtectedRoute allowedRoles={['owner']}>
-            <EditCar />
-          </ProtectedRoute>
-        } />
-        <Route path='/owner/add-car' element={
-          <ProtectedRoute allowedRoles={['owner']}>
-            <AddCar />
-          </ProtectedRoute>
-        } />
-        <Route path='/owner/manage-cars' element={
-          <ProtectedRoute allowedRoles={['owner']}>
-            <ManageCars />
-          </ProtectedRoute>
-        } />
-        <Route path='/owner/manage-bookings' element={
-          <ProtectedRoute allowedRoles={['owner']}>
-            <ManageBookings />
-          </ProtectedRoute>
-        } />
+        <Route path='/contact' element={<Contact />} />
+        <Route path='/about' element={<About />} />
+        <Route path='/terms' element={<TermsOfService />} />
+        <Route path='/privacy' element={<PrivacyPolicy />} />
+        <Route path='/owner' element={<OwnerDashboard />} />
+        <Route path='/owner/edit-car/:id' element={<EditCar />} />
+        <Route path='/owner/add-car' element={<AddCar />} />
+        <Route path='/owner/manage-cars' element={<ManageCars />} />
+        <Route path='/owner/manage-bookings' element={<ManageBookings />} />
+        <Route path='/owner/revenue' element={<Revenue />} />
+        {/* Catch-all route for 404 */}
+        <Route path='*' element={<NotFound />} />
       </Routes>
-      {!isOwnerPath && <Footer />}
+      {!isOwnerpath && <Footer />}
+
     </>
   );
 };

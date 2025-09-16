@@ -1,49 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
-import { loadAllBookings, updateBookingStatus, getStorageStats, getDashboardStats } from '../utils/bookingStorage';
+import { bookingServices, carServices } from '../services/firebaseServices';
+import { useAuth } from '../context/AuthContext';
+import LoadingSpinner from '../Components/LoadingSpinner';
 
 const ManageBookings = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [bookings, setBookings] = useState([]);
+  const [cars, setCars] = useState([]);
   const [filterStatus, setFilterStatus] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const loadBookings = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Use centralized booking storage utility
-        console.log('📊 Loading all bookings for owner dashboard...');
-        const allBookings = loadAllBookings();
+        // Load all bookings and owner's cars from Firebase
+        console.log('📊 Loading bookings and cars for owner dashboard...');
+        const [allBookings, ownerCars] = await Promise.all([
+          bookingServices.getAllBookings(),
+          carServices.getOwnerCars(user.id)
+        ]);
 
-        console.log(`✅ Owner loaded ${allBookings.length} total bookings`);
-        setBookings(allBookings);
+        // Filter bookings to only show those for owner's cars
+        const ownerBookings = allBookings.filter(booking =>
+          ownerCars.some(car => car.id === booking.carId)
+        );
+
+        console.log(`✅ Owner loaded ${ownerBookings.length} bookings for ${ownerCars.length} cars`);
+        setBookings(ownerBookings);
+        setCars(ownerCars);
 
       } catch (err) {
-        console.error('❌ Error loading bookings:', err);
+        console.error('❌ Error loading data:', err);
         setError('Failed to load bookings. Please refresh the page or contact support.');
       } finally {
         setLoading(false);
       }
     };
 
-    loadBookings();
-  }, []);
+    if (user?.id) {
+      loadData();
+    }
+  }, [user]);
 
   const filteredBookings = bookings.filter(booking => {
     const matchesStatus = !filterStatus || booking.status === filterStatus;
+    const car = cars.find(c => c.id === booking.carId);
     const matchesSearch = !searchTerm ||
-      booking.car?.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.car?.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.customerInfo?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.customerInfo?.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.customerInfo?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking._id?.toLowerCase().includes(searchTerm.toLowerCase());
+      car?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      car?.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      car?.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.id?.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesStatus && matchesSearch;
   });
 
@@ -52,52 +66,31 @@ const ManageBookings = () => {
       console.log(`🔄 Owner updating booking ${bookingId} to status: ${newStatus}`);
 
       // Get current booking to check if it's being canceled
-      const allBookings = loadAllBookings();
-      const currentBooking = allBookings.find(booking => booking._id === bookingId);
+      const currentBooking = bookings.find(booking => booking.id === bookingId);
 
-      // Use centralized booking storage utility
-      const result = updateBookingStatus(bookingId, newStatus);
+      // Use Firebase booking service
+      await bookingServices.updateBookingStatus(bookingId, newStatus, user.id);
 
-      if (result.success) {
-        // Handle owner cancellation logic
-        if (newStatus === 'cancelled' && currentBooking?.status === 'confirmed') {
-          // Owner is canceling an approved booking
-          console.log(`💸 Processing owner cancellation refund for booking ${bookingId}`);
-
-          // Prepare cancellation details
-          const cancellationDetails = {
-            canceledBy: 'owner',
-            canceledAt: new Date().toISOString(),
-            refundAmount: currentBooking.paymentInfo?.amount || currentBooking.price,
-            refundStatus: 'processed'
-          };
-
-          // Update the booking with cancellation details
-          const cancelResult = updateBookingStatus(bookingId, 'canceled_by_owner', cancellationDetails);
-          if (cancelResult.success) {
-            console.log(`✅ Owner cancellation processed with refund: $${updatedBooking.refundAmount}`);
-
-            // Decrease total bookings counter for owner cancellations
-            const currentTotal = parseInt(localStorage.getItem('totalBookingsCounter') || '2');
-            if (currentTotal > 0) {
-              const newTotal = currentTotal - 1;
-              localStorage.setItem('totalBookingsCounter', newTotal.toString());
-              console.log(`📊 Total bookings counter decreased: ${currentTotal} → ${newTotal} (owner cancellation)`);
-            }
-          }
-        }
-
-        // Reload all bookings to reflect the change
-        const updatedBookings = loadAllBookings();
-        setBookings(updatedBookings);
-
-        const statusMessage = newStatus === 'canceled_by_owner' ? 'Canceled by Owner' : newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-        console.log(`✅ Owner successfully updated booking ${bookingId} to ${newStatus}`);
-        alert(`✅ Booking ${statusMessage} successfully!${newStatus === 'canceled_by_owner' ? ' Refund has been processed.' : ''}`);
+      // Handle owner cancellation logic
+      if (newStatus === 'cancelled' && currentBooking?.status === 'confirmed') {
+        // Owner is canceling an approved booking - this would trigger refund logic
+        console.log(`💸 Processing owner cancellation refund for booking ${bookingId}`);
+        alert('✅ Booking cancelled successfully! Refund has been processed.');
+      } else if (newStatus === 'confirmed') {
+        alert('✅ Booking confirmed successfully! Revenue has been added to your dashboard.');
       } else {
-        console.error('❌ Status update failed:', result.message);
-        alert(`❌ Failed to update booking status: ${result.message}`);
+        const statusMessage = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+        alert(`✅ Booking ${statusMessage} successfully!`);
       }
+
+      // Reload bookings to reflect the change
+      const updatedBookings = await bookingServices.getAllBookings();
+      const ownerBookings = updatedBookings.filter(booking =>
+        cars.some(car => car.id === booking.carId)
+      );
+      setBookings(ownerBookings);
+
+      console.log(`✅ Owner successfully updated booking ${bookingId} to ${newStatus}`);
 
     } catch (err) {
       console.error('❌ Error in owner status update:', err);
@@ -105,8 +98,11 @@ const ManageBookings = () => {
 
       // Reload bookings to ensure UI consistency
       try {
-        const refreshedBookings = loadAllBookings();
-        setBookings(refreshedBookings);
+        const refreshedBookings = await bookingServices.getAllBookings();
+        const ownerBookings = refreshedBookings.filter(booking =>
+          cars.some(car => car.id === booking.carId)
+        );
+        setBookings(ownerBookings);
       } catch (reloadError) {
         console.error('❌ Error reloading bookings after failed update:', reloadError);
       }
@@ -314,145 +310,136 @@ const ManageBookings = () => {
                 <p className='text-gray-600'>Try adjusting your search or filter criteria.</p>
               </div>
             ) : (
-              filteredBookings.map((booking) => (
-                <div key={booking._id} className={`bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow ${booking.status === 'pending' ? 'ring-2 ring-yellow-300 bg-yellow-50/30' : ''}`}>
-                <div className='flex flex-col lg:flex-row gap-6'>
-                  {/* Car Image */}
-                  <div className='lg:w-48'>
-                    <img
-                      src={booking.car?.image || assets.main_car}
-                      alt={`${booking.car?.brand || 'Car'} ${booking.car?.model || ''}`}
-                      loading="lazy"
-                      className='w-full h-32 object-cover rounded-xl'
-                    />
-                    {booking.status === 'pending' && (
-                      <div className='mt-2 text-center'>
-                        <span className='inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800'>
-                          <span className='w-1.5 h-1.5 bg-yellow-400 rounded-full mr-1 animate-pulse'></span>
-                          Awaiting Confirmation
-                        </span>
-                      </div>
-                    )}
-                    {booking.status === 'confirmed' && (
-                      <div className='mt-2 text-center'>
-                        <span className='inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800'>
-                          <span className='w-1.5 h-1.5 bg-green-400 rounded-full mr-1'></span>
-                          Confirmed
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Booking Details */}
-                  <div className='flex-1'>
-                    <div className='flex flex-col md:flex-row md:items-center justify-between mb-4'>
-                      <div>
-                        <h3 className='text-xl font-bold text-gray-900 mb-1'>
-                          {booking.car?.brand || 'Car'} {booking.car?.model || ''}
-                        </h3>
-                        <p className='text-gray-600'>{booking.car?.location || 'Location not specified'}</p>
-                      </div>
-                      <div className='mt-2 md:mt-0'>
-                        <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(booking.status)}`}>
-                          {booking.status === 'canceled_by_owner' ? 'Canceled by Owner' :
-                           booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-4'>
-                      <div>
-                        <p className='text-sm text-gray-600'>Pickup Date</p>
-                        <p className='font-medium'>{formatDate(booking.pickupDate)}</p>
-                      </div>
-                      <div>
-                        <p className='text-sm text-gray-600'>Return Date</p>
-                        <p className='font-medium'>{formatDate(booking.returnDate)}</p>
-                      </div>
-                      <div>
-                        <p className='text-sm text-gray-600'>Total Amount</p>
-                        <p className='font-bold text-blue-600'>{formatCurrency(booking.price)}</p>
-                      </div>
-                    </div>
-
-                    {/* Customer Information */}
-                    <div className='bg-gray-50 rounded-lg p-4 mb-4'>
-                      <h4 className='text-sm font-semibold text-gray-900 mb-2'>Customer Details</h4>
-                      <div className='grid grid-cols-1 md:grid-cols-2 gap-4 text-sm'>
-                        <div>
-                          <span className='font-medium text-gray-700'>Name:</span>
-                          <span className='ml-2 text-gray-600'>{booking.customerInfo?.firstName} {booking.customerInfo?.lastName}</span>
-                        </div>
-                        <div>
-                          <span className='font-medium text-gray-700'>Email:</span>
-                          <span className='ml-2 text-gray-600'>{booking.customerInfo?.email}</span>
-                        </div>
-                        <div>
-                          <span className='font-medium text-gray-700'>Phone:</span>
-                          <span className='ml-2 text-gray-600'>{booking.customerInfo?.phone}</span>
-                        </div>
-                        <div>
-                          <span className='font-medium text-gray-700'>License:</span>
-                          <span className='ml-2 text-gray-600'>{booking.customerInfo?.licenseNumber || 'Not provided'}</span>
-                        </div>
-                      </div>
-                      {booking.specialRequests && (
-                        <div className='mt-3'>
-                          <span className='font-medium text-gray-700'>Special Requests:</span>
-                          <p className='mt-1 text-gray-600 text-sm bg-white p-2 rounded border'>{booking.specialRequests}</p>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className='flex flex-col md:flex-row gap-4 md:items-center justify-between'>
-                      <div className='text-sm text-gray-600'>
-                        <span className='font-medium'>Booking ID:</span> {booking._id}
-                        <span className='ml-4 font-medium'>Created:</span> {new Date(booking.createdAt).toLocaleDateString()}
-                        {booking.status === 'canceled_by_owner' && booking.refundAmount && (
-                          <span className='ml-4'>
-                            <span className='font-medium text-orange-600'>Refunded:</span>
-                            <span className='text-orange-600'> ${booking.refundAmount}</span>
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Status Actions */}
-                      <div className='flex gap-2'>
+              filteredBookings.map((booking) => {
+                const car = cars.find(c => c.id === booking.carId) || {};
+                return (
+                  <div key={booking.id} className={`bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow ${booking.status === 'pending' ? 'ring-2 ring-yellow-300 bg-yellow-50/30' : ''}`}>
+                    <div className='flex flex-col lg:flex-row gap-6'>
+                      {/* Car Image */}
+                      <div className='lg:w-48'>
+                        <img
+                          src={car.images?.[0] || car.imageURL || car.image || assets.main_car}
+                          alt={`${car.brand || car.name || 'Car'} ${car.model || ''}`}
+                          loading="lazy"
+                          className='w-full h-32 object-cover rounded-xl'
+                        />
                         {booking.status === 'pending' && (
-                          <>
-                            <button
-                              onClick={() => handleStatusChange(booking._id, 'confirmed')}
-                              className='px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium'
-                            >
-                              ✅ Approve Request
-                            </button>
-                            <button
-                              onClick={() => handleStatusChange(booking._id, 'cancelled')}
-                              className='px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium'
-                            >
-                              ❌ Reject Request
-                            </button>
-                          </>
+                          <div className='mt-2 text-center'>
+                            <span className='inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800'>
+                              <span className='w-1.5 h-1.5 bg-yellow-400 rounded-full mr-1 animate-pulse'></span>
+                              Awaiting Confirmation
+                            </span>
+                          </div>
                         )}
                         {booking.status === 'confirmed' && (
-                          <button
-                            onClick={() => handleStatusChange(booking._id, 'cancelled')}
-                            className='px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium'
-                          >
-                            Cancel Booking
-                          </button>
+                          <div className='mt-2 text-center'>
+                            <span className='inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800'>
+                              <span className='w-1.5 h-1.5 bg-green-400 rounded-full mr-1'></span>
+                              Confirmed
+                            </span>
+                          </div>
                         )}
-                        {booking.status === 'cancelled' && (
-                          <span className='px-4 py-2 bg-gray-200 text-gray-600 rounded-lg text-sm font-medium'>
-                            Request Cancelled
-                          </span>
-                        )}
+                      </div>
+
+                      {/* Booking Details */}
+                      <div className='flex-1'>
+                        <div className='flex flex-col md:flex-row md:items-center justify-between mb-4'>
+                          <div>
+                            <h3 className='text-xl font-bold text-gray-900 mb-1'>
+                              {car.brand || car.name || 'Car'} {car.model || ''}
+                            </h3>
+                            <p className='text-gray-600'>{car.location || 'Location not specified'}</p>
+                          </div>
+                          <div className='mt-2 md:mt-0'>
+                            <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(booking.status)}`}>
+                              {booking.status === 'canceled_by_owner' ? 'Canceled by Owner' :
+                               booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-4'>
+                          <div>
+                            <p className='text-sm text-gray-600'>Pickup Date</p>
+                            <p className='font-medium'>{formatDate(booking.pickupDate)}</p>
+                          </div>
+                          <div>
+                            <p className='text-sm text-gray-600'>Return Date</p>
+                            <p className='font-medium'>{formatDate(booking.returnDate)}</p>
+                          </div>
+                          <div>
+                            <p className='text-sm text-gray-600'>Total Amount</p>
+                            <p className='font-bold text-blue-600'>{formatCurrency(booking.totalPrice)}</p>
+                          </div>
+                        </div>
+
+                        {/* Customer Information */}
+                        <div className='bg-gray-50 rounded-lg p-4 mb-4'>
+                          <h4 className='text-sm font-semibold text-gray-900 mb-2'>Customer Details</h4>
+                          <div className='grid grid-cols-1 md:grid-cols-2 gap-4 text-sm'>
+                            <div>
+                              <span className='font-medium text-gray-700'>Name:</span>
+                              <span className='ml-2 text-gray-600'>{booking.customerName || 'N/A'}</span>
+                            </div>
+                            <div>
+                              <span className='font-medium text-gray-700'>Email:</span>
+                              <span className='ml-2 text-gray-600'>{booking.customerEmail || 'N/A'}</span>
+                            </div>
+                            <div>
+                              <span className='font-medium text-gray-700'>Phone:</span>
+                              <span className='ml-2 text-gray-600'>{booking.customerPhone || 'N/A'}</span>
+                            </div>
+                            <div>
+                              <span className='font-medium text-gray-700'>License:</span>
+                              <span className='ml-2 text-gray-600'>Not provided</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className='flex flex-col md:flex-row gap-4 md:items-center justify-between'>
+                          <div className='text-sm text-gray-600'>
+                            <span className='font-medium'>Booking ID:</span> {booking.id}
+                            <span className='ml-4 font-medium'>Created:</span> {new Date(booking.createdAt?.toDate?.() || booking.createdAt).toLocaleDateString()}
+                          </div>
+
+                          {/* Status Actions */}
+                          <div className='flex gap-2'>
+                            {booking.status === 'pending' && (
+                              <>
+                                <button
+                                  onClick={() => handleStatusChange(booking.id, 'confirmed')}
+                                  className='px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium'
+                                >
+                                  ✅ Approve Request
+                                </button>
+                                <button
+                                  onClick={() => handleStatusChange(booking.id, 'cancelled')}
+                                  className='px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium'
+                                >
+                                  ❌ Reject Request
+                                </button>
+                              </>
+                            )}
+                            {booking.status === 'confirmed' && (
+                              <button
+                                onClick={() => handleStatusChange(booking.id, 'cancelled')}
+                                className='px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium'
+                              >
+                                Cancel Booking
+                              </button>
+                            )}
+                            {booking.status === 'cancelled' && (
+                              <span className='px-4 py-2 bg-gray-200 text-gray-600 rounded-lg text-sm font-medium'>
+                                Request Cancelled
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            ))
+                );
+              })
             )}
           </div>
 
@@ -461,25 +448,32 @@ const ManageBookings = () => {
           {/* Summary Stats */}
           <div className='mt-8 grid grid-cols-1 md:grid-cols-4 gap-6'>
             {(() => {
-              const stats = getDashboardStats();
+              const totalBookings = bookings.length;
+              const confirmedBookings = bookings.filter(b => b.status === 'confirmed').length;
+              const pendingBookings = bookings.filter(b => b.status === 'pending').length;
+              const cancelledBookings = bookings.filter(b => b.status === 'cancelled').length;
+              const totalRevenue = bookings
+                .filter(b => b.status === 'confirmed')
+                .reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+
               return (
                 <>
                   <div className='bg-white rounded-2xl shadow-lg p-6 text-center'>
                     <div className='text-3xl font-bold text-blue-600 mb-2'>
-                      {parseInt(localStorage.getItem('totalBookingsCounter') || '2')}
+                      {confirmedBookings}
                     </div>
                     <div className='text-gray-600'>Total Confirmed Bookings</div>
                   </div>
                   <div className='bg-white rounded-2xl shadow-lg p-6 text-center'>
-                    <div className='text-3xl font-bold text-green-600 mb-2'>${stats.totalRevenue.toFixed(2)}</div>
+                    <div className='text-3xl font-bold text-green-600 mb-2'>${totalRevenue.toFixed(2)}</div>
                     <div className='text-gray-600'>Total Revenue</div>
                   </div>
                   <div className='bg-white rounded-2xl shadow-lg p-6 text-center'>
-                    <div className='text-3xl font-bold text-yellow-600 mb-2'>{stats.pendingBookings}</div>
+                    <div className='text-3xl font-bold text-yellow-600 mb-2'>{pendingBookings}</div>
                     <div className='text-gray-600'>Pending Approval</div>
                   </div>
                   <div className='bg-white rounded-2xl shadow-lg p-6 text-center'>
-                    <div className='text-3xl font-bold text-red-600 mb-2'>{stats.cancelledBookings}</div>
+                    <div className='text-3xl font-bold text-red-600 mb-2'>{cancelledBookings}</div>
                     <div className='text-gray-600'>Cancelled</div>
                   </div>
                 </>

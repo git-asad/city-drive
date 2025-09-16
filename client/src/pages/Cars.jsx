@@ -1,7 +1,7 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { assets, dummyCarData } from '../assets/assets';
-import { carServices } from '../services/firebaseServices';
+import { carServices, bookingServices } from '../services/firebaseServices';
 import LoadingSpinner from '../Components/LoadingSpinner';
 import { useAuth } from '../context/AuthContext';
 
@@ -16,6 +16,8 @@ const Cars = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [priceRange, setPriceRange] = useState('');
+  const [pickupDate, setPickupDate] = useState('');
+  const [returnDate, setReturnDate] = useState('');
   const [sortBy, setSortBy] = useState('createdAt');
   const [viewMode, setViewMode] = useState('grid'); // grid or list
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,30 +33,6 @@ const Cars = () => {
     }
   }, [location.search]);
 
-  // Function to check if a car is visible and not deleted
-  const isCarVisible = (car) => {
-    // Check if this is a dummy car that has been deleted
-    const deletedDummyCars = JSON.parse(localStorage.getItem('deletedDummyCars') || '[]');
-    if (deletedDummyCars.includes(car._id)) {
-      return false; // Car has been deleted
-    }
-
-    // Check if this is a dummy car and if it's hidden in localStorage
-    const dummyVisibility = JSON.parse(localStorage.getItem('dummyCarVisibility') || '{}');
-    if (dummyCarData.some(dummyCar => dummyCar._id === car._id)) {
-      return dummyVisibility[car._id] !== false; // Default to true if not set
-    }
-
-    // For added cars, check their isVisible property
-    const addedCars = JSON.parse(localStorage.getItem('addedCars') || '[]');
-    const addedCar = addedCars.find(addedCar => addedCar._id === car._id);
-    if (addedCar) {
-      return addedCar.isVisible !== false; // Default to true if not set
-    }
-
-    // For cars from API, assume they are visible unless specified
-    return true;
-  };
 
   // Fetch cars from Firebase
   const fetchCars = async () => {
@@ -65,8 +43,40 @@ const Cars = () => {
       // Get all cars from Firebase
       const allCars = await carServices.getAllCars();
 
+      // If dates are selected, get bookings to check availability
+      let availableCars = [...allCars];
+      if (pickupDate && returnDate) {
+        try {
+          const allBookings = await bookingServices.getAllBookings();
+          const pickup = new Date(pickupDate);
+          const returnD = new Date(returnDate);
+
+          // Filter out cars that have conflicting bookings
+          availableCars = allCars.filter(car => {
+            const carBookings = allBookings.filter(booking =>
+              booking.carId === car.id &&
+              (booking.status === 'confirmed' || booking.status === 'pending')
+            );
+
+            // Check if any booking conflicts with the requested dates
+            const hasConflict = carBookings.some(booking => {
+              const bookingStart = new Date(booking.startDate?.toDate?.() || booking.startDate);
+              const bookingEnd = new Date(booking.endDate?.toDate?.() || booking.endDate);
+
+              // Check for date overlap
+              return (pickup <= bookingEnd && returnD >= bookingStart);
+            });
+
+            return !hasConflict;
+          });
+        } catch (bookingError) {
+          console.warn('Could not fetch bookings for availability check:', bookingError);
+          // Continue with all cars if booking fetch fails
+        }
+      }
+
       // Apply client-side filtering
-      let filteredCars = [...allCars];
+      let filteredCars = [...availableCars];
 
       // Apply search filter
       if (searchTerm) {
@@ -139,7 +149,7 @@ const Cars = () => {
   // Fetch cars when filters change
   useEffect(() => {
     fetchCars();
-  }, [searchTerm, selectedCategory, selectedLocation, priceRange, sortBy, currentPage]);
+  }, [searchTerm, selectedCategory, selectedLocation, pickupDate, returnDate, priceRange, sortBy, currentPage]);
 
   // Refresh data when window regains focus (in case visibility was changed in ManageCars)
   useEffect(() => {
@@ -159,6 +169,8 @@ const Cars = () => {
     setSearchTerm('');
     setSelectedCategory('');
     setSelectedLocation('');
+    setPickupDate('');
+    setReturnDate('');
     setPriceRange('');
     setSortBy('createdAt');
     setCurrentPage(1);
@@ -179,7 +191,7 @@ const Cars = () => {
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         {/* Filters and Search */}
         <div className='bg-white rounded-2xl shadow-lg p-6 mb-8'>
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4'>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4 mb-4'>
             {/* Search */}
             <div className='lg:col-span-2'>
               <input
@@ -219,6 +231,30 @@ const Cars = () => {
               </select>
             </div>
 
+            {/* Pickup Date */}
+            <div>
+              <input
+                type='date'
+                value={pickupDate}
+                onChange={(e) => setPickupDate(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+                className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                placeholder='Pickup Date'
+              />
+            </div>
+
+            {/* Return Date */}
+            <div>
+              <input
+                type='date'
+                value={returnDate}
+                onChange={(e) => setReturnDate(e.target.value)}
+                min={pickupDate || new Date().toISOString().split('T')[0]}
+                className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                placeholder='Return Date'
+              />
+            </div>
+
             {/* Price Range */}
             <div>
               <select
@@ -240,7 +276,7 @@ const Cars = () => {
               <span className='text-sm text-gray-600'>
                 {totalCars} cars found
               </span>
-              {(searchTerm || selectedCategory || selectedLocation || priceRange) && (
+              {(searchTerm || selectedCategory || selectedLocation || pickupDate || returnDate || priceRange) && (
                 <button
                   onClick={clearFilters}
                   className='text-sm text-blue-600 hover:text-blue-800 font-medium'
@@ -329,6 +365,7 @@ const Cars = () => {
                     <img
                       src={car.images?.[0] || car.image || assets.car_image1}
                       alt={`${car.name} ${car.model}`}
+                      loading="lazy"
                       className={`w-full object-cover ${viewMode === 'list' ? 'h-32' : 'h-full'}`}
                     />
                     <div className='absolute top-3 right-3'>

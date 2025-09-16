@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { assets } from '../assets/assets';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 const Settings = () => {
   const { user } = useAuth();
@@ -35,25 +37,49 @@ const Settings = () => {
     maintenanceAlerts: true
   });
 
-  const handleProfileUpdate = (e) => {
+  const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    // Save profile data
-    localStorage.setItem('ownerProfile', JSON.stringify(profileData));
-    alert('Profile updated successfully!');
+    try {
+      const userSettingsRef = doc(db, 'userSettings', user.id);
+      await setDoc(userSettingsRef, {
+        profile: profileData,
+        updatedAt: new Date()
+      }, { merge: true });
+      alert('Profile updated successfully!');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Failed to update profile. Please try again.');
+    }
   };
 
-  const handleWebsiteSettingsUpdate = (e) => {
+  const handleWebsiteSettingsUpdate = async (e) => {
     e.preventDefault();
-    // Save website settings
-    localStorage.setItem('websiteSettings', JSON.stringify(websiteSettings));
-    alert('Website settings updated successfully!');
+    try {
+      const userSettingsRef = doc(db, 'userSettings', user.id);
+      await setDoc(userSettingsRef, {
+        website: websiteSettings,
+        updatedAt: new Date()
+      }, { merge: true });
+      alert('Website settings updated successfully!');
+    } catch (error) {
+      console.error('Error updating website settings:', error);
+      alert('Failed to update website settings. Please try again.');
+    }
   };
 
-  const handleNotificationSettingsUpdate = (e) => {
+  const handleNotificationSettingsUpdate = async (e) => {
     e.preventDefault();
-    // Save notification settings
-    localStorage.setItem('notificationSettings', JSON.stringify(notificationSettings));
-    alert('Notification settings updated successfully!');
+    try {
+      const userSettingsRef = doc(db, 'userSettings', user.id);
+      await setDoc(userSettingsRef, {
+        notifications: notificationSettings,
+        updatedAt: new Date()
+      }, { merge: true });
+      alert('Notification settings updated successfully!');
+    } catch (error) {
+      console.error('Error updating notification settings:', error);
+      alert('Failed to update notification settings. Please try again.');
+    }
   };
 
   const handleInputChange = (section, field, value) => {
@@ -68,21 +94,32 @@ const Settings = () => {
 
   // Load saved data on component mount
   useEffect(() => {
-    const savedProfile = localStorage.getItem('ownerProfile');
-    if (savedProfile) {
-      setProfileData(JSON.parse(savedProfile));
-    }
+    const loadUserSettings = async () => {
+      if (user?.id) {
+        try {
+          const userSettingsRef = doc(db, 'userSettings', user.id);
+          const userSettingsSnap = await getDoc(userSettingsRef);
 
-    const savedWebsiteSettings = localStorage.getItem('websiteSettings');
-    if (savedWebsiteSettings) {
-      setWebsiteSettings(JSON.parse(savedWebsiteSettings));
-    }
+          if (userSettingsSnap.exists()) {
+            const data = userSettingsSnap.data();
+            if (data.profile) {
+              setProfileData(prev => ({ ...prev, ...data.profile }));
+            }
+            if (data.website) {
+              setWebsiteSettings(prev => ({ ...prev, ...data.website }));
+            }
+            if (data.notifications) {
+              setNotificationSettings(prev => ({ ...prev, ...data.notifications }));
+            }
+          }
+        } catch (error) {
+          console.error('Error loading user settings:', error);
+        }
+      }
+    };
 
-    const savedNotificationSettings = localStorage.getItem('notificationSettings');
-    if (savedNotificationSettings) {
-      setNotificationSettings(JSON.parse(savedNotificationSettings));
-    }
-  }, []);
+    loadUserSettings();
+  }, [user]);
 
   const tabs = [
     { id: 'profile', name: 'Profile', icon: assets.user_profile },

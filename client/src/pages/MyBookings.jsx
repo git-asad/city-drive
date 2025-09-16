@@ -8,7 +8,7 @@ import { bookingServices } from '../services/firebaseServices';
 
 const MyBookings = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { user } = useAuth();
   // Removed tab and booking creation state - only showing bookings list now
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -232,7 +232,7 @@ const MyBookings = () => {
                   <div className='flex items-center justify-between'>
                     <div className='flex items-center space-x-4'>
                       <img
-                        src={assets.main_car}
+                        src={booking.carImage || assets.main_car}
                         alt={booking.carName || 'Car'}
                         loading="lazy"
                         className='w-16 h-16 object-cover rounded-lg'
@@ -244,9 +244,9 @@ const MyBookings = () => {
                         <p className='text-sm text-gray-600'>{booking.carModel || ''}</p>
                         <div className='flex items-center space-x-4 mt-1'>
                           <span className='text-sm text-gray-500'>
-                            {formatDate(booking.startDate)} - {formatDate(booking.endDate)}
+                            {formatDate(booking.pickupDate)} - {formatDate(booking.returnDate)}
                           </span>
-                          <span className='text-sm text-gray-500'>{booking.days} days</span>
+                          <span className='text-sm text-gray-500'>{booking.days || Math.ceil((new Date(booking.returnDate) - new Date(booking.pickupDate)) / (1000 * 60 * 60 * 24))} days</span>
                         </div>
                       </div>
                     </div>

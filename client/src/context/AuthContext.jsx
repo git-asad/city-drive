@@ -1,19 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut as firebaseSignOut,
+  createUserWithEmailAndPassword,
+  signOut,
   onAuthStateChanged
 } from 'firebase/auth';
-import {
-  doc,
-  setDoc,
-  getDoc,
-  collection,
-  query,
-  where,
-  getDocs
-} from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
 // Create the Auth Context
@@ -29,21 +21,49 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          // Load user role from Firestore
-          const userRole = await loadUserRole(firebaseUser.uid);
-          const userData = {
-            id: firebaseUser.uid,
-            email: firebaseUser.email,
-            role: userRole,
-            name: firebaseUser.displayName || firebaseUser.email.split('@')[0]
-          };
-          setUser(userData);
+          // Get user role from Firestore
+          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            const authenticatedUser = {
+              id: firebaseUser.uid,
+              email: firebaseUser.email,
+              name: userData.name || firebaseUser.displayName || firebaseUser.email.split('@')[0],
+              role: userData.role || 'customer'
+            };
+            setUser(authenticatedUser);
+            localStorage.setItem('user', JSON.stringify(authenticatedUser));
+          } else {
+            // User exists in Auth but not in Firestore - create basic profile
+            const basicUser = {
+              id: firebaseUser.uid,
+              email: firebaseUser.email,
+              name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
+              role: 'customer'
+            };
+            await setDoc(doc(db, 'users', firebaseUser.uid), {
+              email: firebaseUser.email,
+              name: basicUser.name,
+              role: 'customer',
+              createdAt: new Date()
+            });
+            setUser(basicUser);
+            localStorage.setItem('user', JSON.stringify(basicUser));
+          }
         } catch (error) {
           console.error('Error loading user data:', error);
-          setUser(null);
+          // Fallback to basic user data
+          const basicUser = {
+            id: firebaseUser.uid,
+            email: firebaseUser.email,
+            name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
+            role: 'customer'
+          };
+          setUser(basicUser);
         }
       } else {
         setUser(null);
+        localStorage.removeItem('user');
       }
       setLoading(false);
     });
@@ -51,100 +71,86 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-  // Load user role from Firestore
-  const loadUserRole = async (uid) => {
-    try {
-      const usersRef = collection(db, 'users');
-      const q = query(usersRef, where('uid', '==', uid));
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-        const userDoc = querySnapshot.docs[0].data();
-        return userDoc.role || 'customer';
-      }
-      return 'customer';
-    } catch (error) {
-      console.error('Error loading user role:', error);
-      return 'customer';
-    }
-  };
-
-  // Create user document in Firestore
-  const createUserDocument = async (user, role = 'customer') => {
-    try {
-      const userDoc = {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName || user.email.split('@')[0],
-        role: role,
-        createdAt: new Date(),
-        profileComplete: false
-      };
-
-      await setDoc(doc(db, 'users', user.uid), userDoc);
-      console.log('✅ User document created in Firestore');
-    } catch (error) {
-      console.error('❌ Failed to create user document:', error);
-      throw error;
-    }
-  };
-
   // Login function
   const login = async (email, password) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // User data will be set by the onAuthStateChanged listener
-      console.log('✅ User signed in:', user.email);
-      return { success: true, user: user };
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      // User data will be set by onAuthStateChanged
+      console.log('✅ User signed in:', result.user.email);
+      return { success: true, user: result.user };
     } catch (error) {
       console.error('❌ Login error:', error);
-      return { success: false, error: error.message };
+      let errorMessage = 'Login failed. Please try again.';
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No account found with this email address.';
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Incorrect password.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Invalid email address.';
+      }
+      return { success: false, error: errorMessage };
     }
   };
 
   // Register function
   const register = async (userData) => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, userData.email, userData.password);
-      const user = userCredential.user;
+      const result = await createUserWithEmailAndPassword(auth, userData.email, userData.password);
 
-      // Create user document in Firestore
-      await createUserDocument(user, userData.role || 'customer');
+      // Create user profile in Firestore
+      await setDoc(doc(db, 'users', result.user.uid), {
+        email: userData.email,
+        name: userData.name,
+        role: 'customer', // Default role for new registrations
+        createdAt: new Date()
+      });
 
-      console.log('✅ User registered successfully:', user.email);
-      return { success: true, user: user };
+      console.log('✅ User registered:', result.user.email);
+      return { success: true, user: result.user };
     } catch (error) {
       console.error('❌ Registration error:', error);
-      return { success: false, error: error.message };
+      let errorMessage = 'Registration failed. Please try again.';
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'An account with this email already exists.';
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'Password should be at least 6 characters.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Invalid email address.';
+      }
+      return { success: false, error: errorMessage };
     }
   };
 
   // Logout function
   const logout = async () => {
     try {
-      await firebaseSignOut(auth);
+      await signOut(auth);
+      setUser(null);
+      localStorage.removeItem('user');
       console.log('✅ User signed out');
     } catch (error) {
       console.error('❌ Logout error:', error);
     }
   };
 
-  // Refresh user data function (useful after profile updates)
-  const refreshUserData = async () => {
-    if (!user) return;
+  // Update user profile
+  const updateProfile = async (profileData) => {
+    if (!user) return { success: false, error: 'No user logged in' };
 
     try {
-      const userRole = await loadUserRole(user.id);
-      const updatedUser = {
-        ...user,
-        role: userRole
-      };
+      await updateDoc(doc(db, 'users', user.id), {
+        ...profileData,
+        updatedAt: new Date()
+      });
+
+      const updatedUser = { ...user, ...profileData };
       setUser(updatedUser);
-      console.log('🔄 User data refreshed in AuthContext');
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+
+      return { success: true };
     } catch (error) {
-      console.error('Error refreshing user data:', error);
+      console.error('Error updating profile:', error);
+      return { success: false, error: 'Failed to update profile' };
     }
   };
 
@@ -174,7 +180,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    refreshUserData,
+    updateProfile,
     isAuthenticated,
     hasRole,
     isOwner,

@@ -44,37 +44,37 @@ const Hero = () => {
   };
 
   return (
-    <div className='min-h-screen flex flex-col items-center justify-center gap-8 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-center relative overflow-hidden'>
+    <div className='min-h-screen flex flex-col items-center justify-center gap-8 bg-gradient-to-br from-black via-slate-900 to-black text-center relative overflow-hidden'>
 
-      {/* Background Pattern */}
-      <div className='absolute inset-0 opacity-10'>
-        <div className='absolute top-20 left-10 w-32 h-32 bg-white rounded-full blur-3xl'></div>
-        <div className='absolute bottom-20 right-10 w-40 h-40 bg-blue-400 rounded-full blur-3xl'></div>
-        <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-purple-400 rounded-full blur-3xl'></div>
+      {/* Luxury Background Pattern */}
+      <div className='absolute inset-0 opacity-5'>
+        <div className='absolute top-20 left-10 w-32 h-32 bg-yellow-400 rounded-full blur-3xl'></div>
+        <div className='absolute bottom-20 right-10 w-40 h-40 bg-gray-300 rounded-full blur-3xl'></div>
+        <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-white rounded-full blur-3xl'></div>
       </div>
 
-      {/* Trust Indicators */}
-      <div className='flex flex-wrap justify-center gap-8 mb-4 text-white/80 text-sm'>
-        <div className='flex items-center gap-2'>
-          <div className='w-2 h-2 bg-green-400 rounded-full'></div>
-          <span>24/7 Support</span>
+      {/* Luxury Trust Indicators */}
+      <div className='flex flex-wrap justify-center gap-8 mb-4 text-white/90 text-sm font-medium'>
+        <div className='flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20'>
+          <div className='w-2 h-2 bg-yellow-400 rounded-full animate-pulse'></div>
+          <span>24/7 Concierge Support</span>
         </div>
-        <div className='flex items-center gap-2'>
-          <div className='w-2 h-2 bg-green-400 rounded-full'></div>
+        <div className='flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20'>
+          <div className='w-2 h-2 bg-yellow-400 rounded-full animate-pulse'></div>
           <span>Free Cancellation</span>
         </div>
-        <div className='flex items-center gap-2'>
-          <div className='w-2 h-2 bg-green-400 rounded-full'></div>
-          <span>Best Price Guarantee</span>
+        <div className='flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20'>
+          <div className='w-2 h-2 bg-yellow-400 rounded-full animate-pulse'></div>
+          <span>Premium Fleet Guarantee</span>
         </div>
       </div>
 
-      <div className='z-10 max-w-4xl mx-auto px-4'>
-        <h1 className='text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in-up hover-scale'>
-          Luxury Cars On <span className='text-yellow-400 animate-pulse-slow'>Rent</span>
+      <div className='z-10 max-w-5xl mx-auto px-4'>
+        <h1 className='text-6xl md:text-8xl font-bold text-white mb-6 animate-fade-in-up hover-scale bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent'>
+          Luxury Cars On <span className='text-yellow-400 animate-pulse-slow drop-shadow-lg'>Rent</span>
         </h1>
-        <p className='text-xl md:text-2xl text-white/90 mb-12 animate-fade-in-up animation-delay-200 transition-smooth'>
-          Experience the freedom of the road with City Drive's premium fleet of luxury vehicles
+        <p className='text-xl md:text-2xl text-white/90 mb-12 animate-fade-in-up animation-delay-200 transition-smooth font-light tracking-wide'>
+          Experience unparalleled freedom with City Drive's exclusive collection of premium and luxury vehicles
         </p>
       </div>
 

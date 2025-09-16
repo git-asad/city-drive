@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 const UserProfile = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, refreshUserData } = useAuth();
+  const { user, refreshUserData } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState({
     firstName: user?.name?.split(' ')[0] || 'John',
