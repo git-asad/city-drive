@@ -471,7 +471,7 @@ const LoginPage = () => {
           <h3 className='text-sm font-medium text-yellow-800 mb-2'>Demo Credentials</h3>
           <div className='text-xs text-yellow-700 space-y-1'>
             <p><strong>Owner:</strong> admin@example.com / admin123</p>
-            <p><strong>User:</strong> user@example.com / user123</p>
+            <p><strong>Client:</strong> asadclient456@gmail.com / asadclient654</p>
           </div>
         </div>
       </div>
