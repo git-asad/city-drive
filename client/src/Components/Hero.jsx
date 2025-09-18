@@ -44,46 +44,46 @@ const Hero = () => {
   };
 
   return (
-    <div className='min-h-screen flex flex-col items-center justify-center gap-8 bg-gradient-to-br from-black via-slate-900 to-black text-center relative overflow-hidden'>
+    <div className='min-h-screen flex flex-col items-center justify-center gap-8 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-center relative overflow-hidden'>
 
-      {/* Luxury Background Pattern */}
-      <div className='absolute inset-0 opacity-5'>
-        <div className='absolute top-20 left-10 w-32 h-32 bg-yellow-400 rounded-full blur-3xl'></div>
-        <div className='absolute bottom-20 right-10 w-40 h-40 bg-gray-300 rounded-full blur-3xl'></div>
-        <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-white rounded-full blur-3xl'></div>
+      {/* Background Pattern */}
+      <div className='absolute inset-0 opacity-10'>
+        <div className='absolute top-20 left-10 w-32 h-32 bg-white rounded-full blur-3xl'></div>
+        <div className='absolute bottom-20 right-10 w-40 h-40 bg-blue-400 rounded-full blur-3xl'></div>
+        <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-purple-400 rounded-full blur-3xl'></div>
       </div>
 
-      {/* Luxury Trust Indicators */}
-      <div className='flex flex-wrap justify-center gap-8 mb-4 text-white/90 text-sm font-medium'>
-        <div className='flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20'>
-          <div className='w-2 h-2 bg-yellow-400 rounded-full animate-pulse'></div>
-          <span>24/7 Concierge Support</span>
+      {/* Trust Indicators */}
+      <div className='flex flex-wrap justify-center gap-8 mb-4 text-white/80 text-sm'>
+        <div className='flex items-center gap-2'>
+          <div className='w-2 h-2 bg-green-400 rounded-full'></div>
+          <span>24/7 Support</span>
         </div>
-        <div className='flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20'>
-          <div className='w-2 h-2 bg-yellow-400 rounded-full animate-pulse'></div>
+        <div className='flex items-center gap-2'>
+          <div className='w-2 h-2 bg-green-400 rounded-full'></div>
           <span>Free Cancellation</span>
         </div>
-        <div className='flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20'>
-          <div className='w-2 h-2 bg-yellow-400 rounded-full animate-pulse'></div>
-          <span>Premium Fleet Guarantee</span>
+        <div className='flex items-center gap-2'>
+          <div className='w-2 h-2 bg-green-400 rounded-full'></div>
+          <span>Best Price Guarantee</span>
         </div>
       </div>
 
-      <div className='z-10 max-w-5xl mx-auto px-4'>
-        <h1 className='text-6xl md:text-8xl font-bold text-white mb-6 animate-fade-in-up hover-scale bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent'>
-          Luxury Cars On <span className='text-yellow-400 animate-pulse-slow drop-shadow-lg'>Rent</span>
+      <div className='z-10 max-w-4xl mx-auto px-4'>
+        <h1 className='text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in-up hover-scale'>
+          Luxury Cars On <span className='text-yellow-400 animate-pulse-slow'>Rent</span>
         </h1>
-        <p className='text-xl md:text-2xl text-white/90 mb-12 animate-fade-in-up animation-delay-200 transition-smooth font-light tracking-wide'>
-          Experience unparalleled freedom with City Drive's exclusive collection of premium and luxury vehicles
+        <p className='text-xl md:text-2xl text-white/90 mb-12 animate-fade-in-up animation-delay-200 transition-smooth'>
+          Experience the freedom of the road with our premium fleet of luxury vehicles
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className='flex flex-col md:flex-row items-center justify-center p-6 md:p-8 rounded-2xl md:rounded-full w-full max-w-5xl bg-white/95 shadow-2xl mx-auto border border-white/20 backdrop-blur-lg animate-fade-in-up animation-delay-400'>
+      <form onSubmit={handleSubmit} className='flex flex-col md:flex-row items-center justify-center p-6 md:p-8 rounded-2xl md:rounded-full w-full max-w-5xl bg-white/98 shadow-2xl mx-auto border-2 border-white/30 backdrop-blur-lg animate-fade-in-up animation-delay-400'>
         <div className='flex flex-col md:flex-row items-center gap-4 md:gap-6 w-full'>
           {/* Pickup Location */}
           <div className='flex flex-col items-start gap-2 flex-1 min-w-0'>
             <label className='text-sm font-semibold text-gray-700 flex items-center gap-2'>
-              <span className='text-lg'>📍</span>
+              <img src={assets.location_icon} alt="" className='w-4 h-4'/>
               Pickup Location
             </label>
             <select
@@ -101,7 +101,7 @@ const Hero = () => {
           {/* Pickup Date */}
           <div className='flex flex-col items-start gap-2 flex-1 min-w-0'>
             <label htmlFor='pickup-date' className='text-sm font-semibold text-gray-700 flex items-center gap-2'>
-              <span className='text-lg'>📅</span>
+              <img src={assets.calendar_icon_colored} alt="" className='w-4 h-4'/>
               Pick-up Date
             </label>
             <input
@@ -117,7 +117,7 @@ const Hero = () => {
           {/* Return Date */}
           <div className='flex flex-col items-start gap-2 flex-1 min-w-0'>
             <label htmlFor='return-date' className='text-sm font-semibold text-gray-700 flex items-center gap-2'>
-              <span className='text-lg'>📅</span>
+              <img src={assets.calendar_icon_colored} alt="" className='w-4 h-4'/>
               Return Date
             </label>
             <input
@@ -132,8 +132,8 @@ const Hero = () => {
           </div>
           {/* Search Button */}
           <div className='flex justify-center md:justify-end flex-1 md:flex-none'>
-            <button type="submit" className='flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-gray-900 rounded-full cursor-pointer shadow-lg hover:shadow-xl transition-all font-bold font-[Montserrat] transform hover:scale-105'>
-              <span className='text-lg'>🔍</span>
+            <button type="submit" className='flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white rounded-full cursor-pointer shadow-xl hover:shadow-2xl transition-all font-bold font-[Montserrat] transform hover:scale-105 border-2 border-white/20'>
+              <img src={assets.search_icon} alt="" className='w-5 h-5'/>
               Search Cars
             </button>
           </div>
@@ -142,27 +142,22 @@ const Hero = () => {
 
       {/* Car Image with Stats */}
       <div className='relative z-10 mt-8'>
-        <img
-          src={assets.main_car}
-          alt="luxury car"
-          loading="lazy"
-          className='max-h-80 md:max-h-96 mx-auto drop-shadow-2xl animate-fade-in-up animation-delay-600'
-        />
+        <img src={assets.main_car} alt="luxury car" className='max-h-80 md:max-h-96 mx-auto drop-shadow-2xl animate-fade-in-up animation-delay-600' />
 
         {/* Floating Stats */}
-        <div className='absolute -top-8 -left-8 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl animate-bounce-in animation-delay-800'>
-          <div className='text-2xl font-bold text-blue-600'>50+</div>
-          <div className='text-sm text-gray-600'>Car Available</div>
+        <div className='absolute -top-8 -left-8 bg-white/98 backdrop-blur-sm rounded-2xl p-4 shadow-2xl border-2 border-white/30 animate-bounce-in animation-delay-800'>
+          <div className='text-2xl font-bold text-blue-700'>50+</div>
+          <div className='text-sm text-gray-700 font-semibold'>Car Available</div>
         </div>
 
-        <div className='absolute -top-8 -right-8 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl animate-bounce-in animation-delay-1000'>
-          <div className='text-2xl font-bold text-green-600'>5K+</div>
-          <div className='text-sm text-gray-600'>Happy Customer</div>
+        <div className='absolute -top-8 -right-8 bg-white/98 backdrop-blur-sm rounded-2xl p-4 shadow-2xl border-2 border-white/30 animate-bounce-in animation-delay-1000'>
+          <div className='text-2xl font-bold text-green-700'>5K+</div>
+          <div className='text-sm text-gray-700 font-semibold'>Happy Customer</div>
         </div>
 
-        <div className='absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl animate-bounce-in animation-delay-1200'>
-          <div className='text-2xl font-bold text-purple-600'>4.9★</div>
-          <div className='text-sm text-gray-600'>Average Rating</div>
+        <div className='absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white/98 backdrop-blur-sm rounded-2xl p-4 shadow-2xl border-2 border-white/30 animate-bounce-in animation-delay-1200'>
+          <div className='text-2xl font-bold text-purple-700'>4.9★</div>
+          <div className='text-sm text-gray-700 font-semibold'>Average Rating</div>
         </div>
       </div>
 

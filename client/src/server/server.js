@@ -7,7 +7,6 @@ import jwt from 'jsonwebtoken';
 import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
 import twilio from 'twilio';
-// import { core } from '@paypal/paypal-server-sdk';
 
 // Import models
 import User from './models/User.js';
@@ -40,13 +39,6 @@ const JWT_SECRET = "super_secret_key";
 
 // Stripe Configuration
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_your_stripe_secret_key_here');
-
-// PayPal Client Setup - Temporarily commented out due to import issues
-// const environment = new paypal.core.SandboxEnvironment(
-//   process.env.PAYPAL_CLIENT_ID || 'your_paypal_client_id_here',
-//   process.env.PAYPAL_SECRET || 'your_paypal_secret_here'
-// );
-// const paypalClient = new paypal.core.PayPalHttpClient(environment);
 
 // Email Configuration
 const emailTransporter = nodemailer.createTransport({
@@ -383,7 +375,7 @@ app.put('/auth/profile', authenticateToken, async (req, res) => {
 });
 
 // Create Payment Intent
-app.post('/create-payment', authenticateToken, async (req, res) => {
+app.post('/create-payment', async (req, res) => {
   try {
     const { carId, pickupDate, returnDate, insurance, email } = req.body;
 
@@ -456,7 +448,7 @@ app.post('/create-payment', authenticateToken, async (req, res) => {
 });
 
 // Confirm Payment and Create Booking
-app.post('/confirm-payment', authenticateToken, async (req, res) => {
+app.post('/confirm-payment', async (req, res) => {
   try {
     const {
       paymentIntentId,
@@ -483,9 +475,9 @@ app.post('/confirm-payment', authenticateToken, async (req, res) => {
       });
     }
 
-    // Create booking record
+    // Create booking record (without user authentication for demo purposes)
     const booking = new Booking({
-      user: req.user.userId,
+      user: null, // No user for anonymous bookings
       car: bookingData.carId,
       pickupDate: bookingData.pickupDate,
       returnDate: bookingData.returnDate,
@@ -542,7 +534,7 @@ const mockBookings = [
     car: {
       brand: 'BMW',
       model: 'X5',
-      images: ['https://via.placeholder.com/400x300/000000/FFFFFF?text=BMW+X5'],
+      images: ['/src/assets/bmw_new.png'],
       pricePerDay: 85
     },
     pickupDate: '2025-01-15',
@@ -564,7 +556,7 @@ const mockBookings = [
     car: {
       brand: 'Mercedes',
       model: 'C-Class',
-      images: ['https://via.placeholder.com/400x300/000000/FFFFFF?text=Mercedes+C-Class'],
+      images: ['/src/assets/car_image1.png'],
       pricePerDay: 75
     },
     pickupDate: '2025-01-20',
@@ -644,50 +636,6 @@ app.get('/bookings', authenticateToken, async (req, res) => {
   }
 });
 
-// Get Owner's Bookings
-app.get('/owner/bookings', authenticateToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.userId);
-    if (!user || (user.role !== 'owner' && user.role !== 'admin')) {
-      return res.status(403).json({
-        success: false,
-        error: 'Access denied'
-      });
-    }
-
-    const { status, page = 1, limit = 20 } = req.query;
-
-    let query = { 'car.owner': req.user.userId };
-    if (status) query.status = status;
-
-    const bookings = await Booking.find(query)
-      .populate('user', 'firstName lastName email phone')
-      .populate('car', 'brand model pricePerDay location')
-      .sort({ createdAt: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .lean();
-
-    const total = await Booking.countDocuments(query);
-
-    res.json({
-      success: true,
-      bookings,
-      pagination: {
-        currentPage: parseInt(page),
-        totalPages: Math.ceil(total / limit),
-        totalBookings: total
-      }
-    });
-  } catch (error) {
-    console.error('Error fetching owner bookings:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch bookings'
-    });
-  }
-});
-
 // Get All Bookings (Admin only)
 app.get('/admin/bookings', authenticateToken, async (req, res) => {
   try {
@@ -734,25 +682,10 @@ app.get('/admin/bookings', authenticateToken, async (req, res) => {
 });
 
 // Update booking status (Admin only)
-app.put('/bookings/:id/status', authenticateToken, async (req, res) => {
+app.put('/admin/bookings/:id/status', authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
-    if (!user || (user.role !== 'admin' && user.role !== 'owner')) {
-      return res.status(403).json({
-        success: false,
-        error: 'Access denied'
-      });
-    }
-
-    const booking = await Booking.findById(req.params.id).populate('car');
-    if (!booking) {
-      return res.status(404).json({
-        success: false,
-        error: 'Booking not found'
-      });
-    }
-
-    if (user.role === 'owner' && booking.car.owner.toString() !== req.user.userId) {
+    if (!user || user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         error: 'Access denied'
@@ -760,6 +693,14 @@ app.put('/bookings/:id/status', authenticateToken, async (req, res) => {
     }
 
     const { status, notes } = req.body;
+
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        error: 'Booking not found'
+      });
+    }
 
     booking.status = status;
     if (notes) {
@@ -1137,7 +1078,7 @@ const mockCars = [
     fuel_type: 'Hybrid',
     transmission: 'Semi-Automatic',
     location: 'New York',
-    images: ['https://via.placeholder.com/400x300/000000/FFFFFF?text=BMW+X5'],
+    images: ['/src/assets/car_image1.png'],
     features: ['GPS', 'Bluetooth', 'Air Conditioning'],
     description: 'The BMW X5 is a mid-size luxury SUV produced by BMW. The X5 made its debut in 1999 as the first SUV ever produced by BMW.',
     isAvailable: true,
@@ -1155,7 +1096,7 @@ const mockCars = [
     fuel_type: 'Diesel',
     transmission: 'Manual',
     location: 'Chicago',
-    images: ['https://via.placeholder.com/400x300/000000/FFFFFF?text=Toyota+Corolla'],
+    images: ['/src/assets/car_image2.png'],
     features: ['GPS', 'Bluetooth', 'Backup Camera'],
     description: 'The Toyota Corolla is a mid-size luxury sedan produced by Toyota. The Corolla made its debut in 2008 as the first sedan ever produced by Toyota.',
     isAvailable: true,
@@ -1173,7 +1114,7 @@ const mockCars = [
     fuel_type: 'Hybrid',
     transmission: 'Automatic',
     location: 'Los Angeles',
-    images: ['https://via.placeholder.com/400x300/000000/FFFFFF?text=Jeep+Wrangler'],
+    images: ['/src/assets/car_image3.png'],
     features: ['4WD', 'Removable Doors', 'GPS'],
     description: 'The Jeep Wrangler is a mid-size luxury SUV produced by Jeep. The Wrangler made its debut in 2003 as the first SUV ever produced by Jeep.',
     isAvailable: true,
@@ -1191,7 +1132,7 @@ const mockCars = [
     fuel_type: 'Diesel',
     transmission: 'Semi-Automatic',
     location: 'Houston',
-    images: ['https://via.placeholder.com/400x300/000000/FFFFFF?text=Ford+Neo+6'],
+    images: ['/src/assets/car_image4.png'],
     features: ['GPS', 'Bluetooth', 'Apple CarPlay'],
     description: 'This is a mid-size luxury sedan produced by Toyota. The Corolla made its debut in 2008 as the first sedan ever produced by Toyota.',
     isAvailable: true,
@@ -1798,4 +1739,8 @@ app.put('/admin/contacts/:id', authenticateToken, async (req, res) => {
   }
 });
 
-export default app;
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

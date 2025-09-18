@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { assets, dummyCarData } from '../assets/assets';
-import { carServices, bookingServices } from '../services/firebaseServices';
+import { assets } from '../assets/assets';
+import { carAPI } from '../utils/api';
 import LoadingSpinner from '../Components/LoadingSpinner';
-import { useAuth } from '../context/AuthContext';
 
 const Cars = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,8 +14,6 @@ const Cars = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [priceRange, setPriceRange] = useState('');
-  const [pickupDate, setPickupDate] = useState('');
-  const [returnDate, setReturnDate] = useState('');
   const [sortBy, setSortBy] = useState('createdAt');
   const [viewMode, setViewMode] = useState('grid'); // grid or list
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,113 +29,48 @@ const Cars = () => {
     }
   }, [location.search]);
 
-
-  // Fetch cars from Firebase
-  const fetchCars = async () => {
+  // Fetch cars from API
+  const fetchCars = async (params = {}) => {
     try {
       setLoading(true);
       setError(null);
 
-      // Get all cars from Firebase
-      const allCars = await carServices.getAllCars();
+      const queryParams = {
+        search: searchTerm,
+        category: selectedCategory,
+        location: selectedLocation,
+        sortBy,
+        sortOrder: sortBy === 'pricePerDay' ? 'desc' : 'asc',
+        page: currentPage,
+        limit: 12,
+        ...params
+      };
 
-      // If dates are selected, get bookings to check availability
-      let availableCars = [...allCars];
-      if (pickupDate && returnDate) {
-        try {
-          const allBookings = await bookingServices.getAllBookings();
-          const pickup = new Date(pickupDate);
-          const returnD = new Date(returnDate);
-
-          // Filter out cars that have conflicting bookings
-          availableCars = allCars.filter(car => {
-            const carBookings = allBookings.filter(booking =>
-              booking.carId === car.id &&
-              (booking.status === 'confirmed' || booking.status === 'pending')
-            );
-
-            // Check if any booking conflicts with the requested dates
-            const hasConflict = carBookings.some(booking => {
-              const bookingStart = new Date(booking.startDate?.toDate?.() || booking.startDate);
-              const bookingEnd = new Date(booking.endDate?.toDate?.() || booking.endDate);
-
-              // Check for date overlap
-              return (pickup <= bookingEnd && returnD >= bookingStart);
-            });
-
-            return !hasConflict;
-          });
-        } catch (bookingError) {
-          console.warn('Could not fetch bookings for availability check:', bookingError);
-          // Continue with all cars if booking fetch fails
-        }
-      }
-
-      // Apply client-side filtering
-      let filteredCars = [...availableCars];
-
-      // Apply search filter
-      if (searchTerm) {
-        filteredCars = filteredCars.filter(car =>
-          car.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          car.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          car.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          car.category?.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      }
-
-      // Apply category filter
-      if (selectedCategory) {
-        filteredCars = filteredCars.filter(car => car.category === selectedCategory);
-      }
-
-      // Apply location filter
-      if (selectedLocation) {
-        filteredCars = filteredCars.filter(car => car.location === selectedLocation);
-      }
-
-      // Apply price range filter
+      // Convert price range to minPrice/maxPrice
       if (priceRange) {
-        filteredCars = filteredCars.filter(car => {
-          const price = car.pricePerDay;
-          switch (priceRange) {
-            case 'under-100':
-              return price < 100;
-            case '100-200':
-              return price >= 100 && price <= 200;
-            case '200-300':
-              return price >= 200 && price <= 300;
-            case 'over-300':
-              return price > 300;
-            default:
-              return true;
-          }
-        });
+        switch (priceRange) {
+          case 'under-100':
+            queryParams.maxPrice = 100;
+            break;
+          case '100-200':
+            queryParams.minPrice = 100;
+            queryParams.maxPrice = 200;
+            break;
+          case '200-300':
+            queryParams.minPrice = 200;
+            queryParams.maxPrice = 300;
+            break;
+          case 'over-300':
+            queryParams.minPrice = 300;
+            break;
+        }
       }
 
-      // Apply sorting
-      filteredCars.sort((a, b) => {
-        switch (sortBy) {
-          case 'pricePerDay':
-            return a.pricePerDay - b.pricePerDay;
-          case 'year':
-            return (b.year || 0) - (a.year || 0);
-          case 'createdAt':
-          default:
-            return new Date(b.createdAt) - new Date(a.createdAt);
-        }
-      });
-
-      // Apply pagination
-      const startIndex = (currentPage - 1) * 12;
-      const endIndex = startIndex + 12;
-      const paginatedCars = filteredCars.slice(startIndex, endIndex);
-
-      setCars(paginatedCars);
-      setTotalPages(Math.ceil(filteredCars.length / 12));
-      setTotalCars(filteredCars.length);
+      const response = await carAPI.getAll(queryParams);
+      setCars(response.cars);
+      setTotalPages(response.pagination.totalPages);
+      setTotalCars(response.pagination.totalCars);
     } catch (err) {
-      console.error('Error fetching cars:', err);
       setError(err.message || 'Failed to fetch cars');
     } finally {
       setLoading(false);
@@ -149,17 +80,7 @@ const Cars = () => {
   // Fetch cars when filters change
   useEffect(() => {
     fetchCars();
-  }, [searchTerm, selectedCategory, selectedLocation, pickupDate, returnDate, priceRange, sortBy, currentPage]);
-
-  // Refresh data when window regains focus (in case visibility was changed in ManageCars)
-  useEffect(() => {
-    const handleFocus = () => {
-      fetchCars();
-    };
-
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
-  }, []);
+  }, [searchTerm, selectedCategory, selectedLocation, priceRange, sortBy, currentPage]);
 
   // Get unique categories and locations for filters
   const categories = [...new Set(cars.map(car => car.category))];
@@ -169,8 +90,6 @@ const Cars = () => {
     setSearchTerm('');
     setSelectedCategory('');
     setSelectedLocation('');
-    setPickupDate('');
-    setReturnDate('');
     setPriceRange('');
     setSortBy('createdAt');
     setCurrentPage(1);
@@ -191,7 +110,7 @@ const Cars = () => {
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         {/* Filters and Search */}
         <div className='bg-white rounded-2xl shadow-lg p-6 mb-8'>
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4 mb-4'>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4'>
             {/* Search */}
             <div className='lg:col-span-2'>
               <input
@@ -231,30 +150,6 @@ const Cars = () => {
               </select>
             </div>
 
-            {/* Pickup Date */}
-            <div>
-              <input
-                type='date'
-                value={pickupDate}
-                onChange={(e) => setPickupDate(e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
-                className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
-                placeholder='Pickup Date'
-              />
-            </div>
-
-            {/* Return Date */}
-            <div>
-              <input
-                type='date'
-                value={returnDate}
-                onChange={(e) => setReturnDate(e.target.value)}
-                min={pickupDate || new Date().toISOString().split('T')[0]}
-                className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
-                placeholder='Return Date'
-              />
-            </div>
-
             {/* Price Range */}
             <div>
               <select
@@ -276,7 +171,7 @@ const Cars = () => {
               <span className='text-sm text-gray-600'>
                 {totalCars} cars found
               </span>
-              {(searchTerm || selectedCategory || selectedLocation || pickupDate || returnDate || priceRange) && (
+              {(searchTerm || selectedCategory || selectedLocation || priceRange) && (
                 <button
                   onClick={clearFilters}
                   className='text-sm text-blue-600 hover:text-blue-800 font-medium'
@@ -355,17 +250,16 @@ const Cars = () => {
             }>
               {cars.map((car) => (
                 <div
-                  key={car.id}
+                  key={car._id}
                   className={`bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer ${
                     viewMode === 'list' ? 'flex' : ''
                   }`}
-                  onClick={() => navigate(`/car-details/${car.id}`)}
+                  onClick={() => navigate(`/car-details/${car._id}`)}
                 >
                   <div className={`relative ${viewMode === 'list' ? 'w-48 flex-shrink-0' : 'w-full h-48'}`}>
                     <img
                       src={car.images?.[0] || car.image || assets.car_image1}
-                      alt={`${car.name} ${car.model}`}
-                      loading="lazy"
+                      alt={`${car.brand} ${car.model}`}
                       className={`w-full object-cover ${viewMode === 'list' ? 'h-32' : 'h-full'}`}
                     />
                     <div className='absolute top-3 right-3'>
@@ -383,7 +277,7 @@ const Cars = () => {
                     <div className='flex justify-between items-start mb-3'>
                       <div>
                         <h3 className='text-xl font-bold text-gray-900 mb-1'>
-                          {car.name} {car.model}
+                          {car.brand} {car.model}
                         </h3>
                         <p className='text-gray-600 text-sm'>{car.category} • {car.year}</p>
                       </div>
@@ -392,11 +286,11 @@ const Cars = () => {
                     <div className='grid grid-cols-2 gap-y-2 text-gray-600 mb-4'>
                       <div className='flex items-center text-sm'>
                         <img src={assets.users_icon} alt="" className='h-4 mr-2'/>
-                        <span>{car.seatingCapacity || car.seating_capacity} Seats</span>
+                        <span>{car.seating_capacity} Seats</span>
                       </div>
                       <div className='flex items-center text-sm'>
                         <img src={assets.fuel_icon} alt="" className='h-4 mr-2'/>
-                        <span>{car.fuelType || car.fuel_type}</span>
+                        <span>{car.fuel_type}</span>
                       </div>
                       <div className='flex items-center text-sm'>
                         <img src={assets.car_icon} alt="" className='h-4 mr-2'/>
@@ -411,29 +305,18 @@ const Cars = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (!isAuthenticated()) {
-                          // Redirect to login with booking URL as return URL
-                          navigate('/login', {
-                            state: {
-                              from: `/booking/${car.id}`,
-                              message: 'You must sign in before booking a car.'
-                            },
-                            replace: true
-                          });
-                        } else {
-                          navigate(`/booking/${car.id}`);
-                        }
+                        navigate(`/booking/${car._id}`);
                       }}
                       className='w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium relative group'
-                      title={`${car.name} ${car.model} - ${car.category} • ${car.seatingCapacity || car.seating_capacity} seats • ${car.fuelType || car.fuel_type} • ${car.transmission} • ${car.location} • $${car.pricePerDay}/day`}
+                      title={`${car.brand} ${car.model} - ${car.category} • ${car.seating_capacity} seats • ${car.fuel_type} • ${car.transmission} • ${car.location} • $${car.pricePerDay}/day`}
                     >
-                      {isAuthenticated() ? 'Book Now' : 'Sign In to Book'}
+                      Book Now
                       {/* Hover Tooltip */}
                       <div className='absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10'>
                         <div className='text-center'>
-                          <div className='font-semibold'>{car.name} {car.model}</div>
+                          <div className='font-semibold'>{car.brand} {car.model}</div>
                           <div className='text-xs text-gray-300 mt-1'>
-                            {car.seatingCapacity || car.seating_capacity} seats • {car.fuelType || car.fuel_type} • {car.year}
+                            {car.seating_capacity} seats • {car.fuel_type} • {car.year}
                           </div>
                           <div className='text-xs text-gray-300'>
                             {car.location} • ${car.pricePerDay}/day

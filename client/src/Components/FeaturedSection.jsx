@@ -20,15 +20,12 @@ const FeaturedSection = () => {
           // Combine dummy cars with added cars and filter visible ones
           const addedCars = JSON.parse(localStorage.getItem('addedCars') || '[]');
           const dummyVisibility = JSON.parse(localStorage.getItem('dummyCarVisibility') || '{}');
-          const deletedDummyCars = JSON.parse(localStorage.getItem('deletedDummyCars') || '[]');
 
-          // Filter out deleted dummy cars and add visibility status
-          const dummyCarsWithVisibility = dummyCarData
-            .filter(car => !deletedDummyCars.includes(car._id)) // Exclude deleted cars
-            .map(car => ({
-              ...car,
-              isVisible: dummyVisibility[car._id] !== false // Default to true if not set
-            }));
+          // Add visibility status to dummy cars
+          const dummyCarsWithVisibility = dummyCarData.map(car => ({
+            ...car,
+            isVisible: dummyVisibility[car._id] !== false // Default to true if not set
+          }));
 
           const allCars = [...dummyCarsWithVisibility, ...addedCars];
           const visibleCars = allCars.filter(car => car.isVisible !== false);
@@ -39,7 +36,7 @@ const FeaturedSection = () => {
               className='animate-fade-in-up hover-lift'
               style={{ animationDelay: `${index * 150}ms` }}
             >
-              <CarCard car={car} showOwnerControls={false} />
+              <CarCard car={car} />
             </div>
           ));
         })()}

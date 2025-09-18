@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
-import { carServices } from '../services/firebaseServices';
-import { useAuth } from '../context/AuthContext';
 
 const AddCar = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [carData, setCarData] = useState({
     brand: '',
     model: '',
@@ -47,36 +44,43 @@ const AddCar = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!user) {
-      alert('Please sign in to add a car');
-      return;
-    }
-
     try {
+      // Generate a unique ID for the new car
+      const newCarId = `car_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
       // Prepare the car data with proper formatting
       const newCar = {
-        name: carData.brand,
-        model: carData.model,
+        _id: newCarId,
+        owner: "67fe3467ed8a8fe17d0ba6e2", // Using the same owner ID as existing cars
         brand: carData.brand,
+        model: carData.model,
+        image: imagePreview || carData.image, // Use uploaded image or fallback
         year: parseInt(carData.year),
         category: carData.category,
-        seatingCapacity: parseInt(carData.seating_capacity),
-        fuelType: carData.fuel_type,
+        seating_capacity: parseInt(carData.seating_capacity),
+        fuel_type: carData.fuel_type,
         transmission: carData.transmission,
         pricePerDay: parseFloat(carData.pricePerDay),
         location: carData.location,
         description: carData.description,
-        images: imagePreview ? [imagePreview] : ['/src/assets/car_image1.png'],
-        features: ['Air Conditioning', 'GPS', 'Bluetooth']
+        isAvaliable: true, // New cars are available by default
+        isVisible: carData.isVisible, // Visibility status
+        createdAt: new Date().toISOString()
       };
 
-      // Add car to Firebase
-      await carServices.addCar(newCar, user.id);
+      // Get existing cars from localStorage or use dummy data
+      const existingCars = JSON.parse(localStorage.getItem('addedCars') || '[]');
 
-      console.log('Car added successfully to Firebase');
+      // Add the new car to the array
+      const updatedCars = [...existingCars, newCar];
+
+      // Save to localStorage
+      localStorage.setItem('addedCars', JSON.stringify(updatedCars));
+
+      console.log('Car added successfully:', newCar);
       alert('Car added successfully! It will now appear in your Manage Cars section.');
 
       // Reset form
@@ -113,8 +117,8 @@ const AddCar = () => {
           <div className='flex items-center gap-3'>
             <img src={assets.user_profile} alt="Profile" className='w-12 h-12 rounded-full' />
             <div>
-              <h3 className='font-semibold text-gray-900'>{user?.name || 'Owner'}</h3>
-              <p className='text-sm text-gray-500'>{user?.email || ''}</p>
+              <h3 className='font-semibold text-gray-900'>GreatStack</h3>
+              <p className='text-sm text-gray-500'>admin@example.com</p>
             </div>
           </div>
         </div>

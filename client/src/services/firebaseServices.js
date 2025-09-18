@@ -1,27 +1,26 @@
-// Firebase services for City Drive
 import {
   collection,
-  addDoc,
-  getDocs,
   doc,
   getDoc,
+  getDocs,
+  addDoc,
   updateDoc,
   deleteDoc,
   query,
   where,
   orderBy,
   limit,
-  Timestamp
+  onSnapshot
 } from 'firebase/firestore';
 import { db } from '../firebase';
 
 // Car Services
 export const carServices = {
-  // Get all available cars
+  // Get all cars
   async getAllCars() {
     try {
       const carsRef = collection(db, 'cars');
-      const q = query(carsRef, where('availability', '==', true), orderBy('createdAt', 'desc'));
+      const q = query(carsRef, orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
 
       const cars = [];
@@ -31,7 +30,7 @@ export const carServices = {
 
       return cars;
     } catch (error) {
-      console.error('❌ Error fetching cars:', error);
+      console.error('Error getting cars:', error);
       throw error;
     }
   },
@@ -40,63 +39,29 @@ export const carServices = {
   async getCarById(carId) {
     try {
       const carDoc = await getDoc(doc(db, 'cars', carId));
-
       if (carDoc.exists()) {
         return { id: carDoc.id, ...carDoc.data() };
       } else {
         throw new Error('Car not found');
       }
     } catch (error) {
-      console.error('❌ Error fetching car:', error);
-      throw error;
-    }
-  },
-
-  // Get owner's cars
-  async getOwnerCars(ownerId) {
-    try {
-      const carsRef = collection(db, 'cars');
-      const q = query(carsRef, where('ownerId', '==', ownerId), orderBy('createdAt', 'desc'));
-      const querySnapshot = await getDocs(q);
-
-      const cars = [];
-      querySnapshot.forEach((doc) => {
-        cars.push({ id: doc.id, ...doc.data() });
-      });
-
-      return cars;
-    } catch (error) {
-      console.error('❌ Error fetching owner cars:', error);
+      console.error('Error getting car:', error);
       throw error;
     }
   },
 
   // Add new car
-  async addCar(carData, ownerId) {
+  async addCar(carData) {
     try {
-      const carDoc = {
-        name: carData.name,
-        brand: carData.brand,
-        model: carData.model,
-        description: carData.description,
-        pricePerDay: carData.pricePerDay,
-        availability: true,
-        imageURL: carData.imageURL,
-        ownerId: ownerId,
-        category: carData.category,
-        year: carData.year,
-        seatingCapacity: carData.seatingCapacity,
-        fuelType: carData.fuelType,
-        transmission: carData.transmission,
-        location: carData.location,
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
-      };
-
-      const docRef = await addDoc(collection(db, 'cars'), carDoc);
-      return { id: docRef.id, ...carDoc };
+      const carsRef = collection(db, 'cars');
+      const docRef = await addDoc(carsRef, {
+        ...carData,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+      return docRef.id;
     } catch (error) {
-      console.error('❌ Error adding car:', error);
+      console.error('Error adding car:', error);
       throw error;
     }
   },
@@ -107,12 +72,11 @@ export const carServices = {
       const carRef = doc(db, 'cars', carId);
       await updateDoc(carRef, {
         ...carData,
-        updatedAt: Timestamp.now()
+        updatedAt: new Date()
       });
-
-      return { id: carId, ...carData };
+      return true;
     } catch (error) {
-      console.error('❌ Error updating car:', error);
+      console.error('Error updating car:', error);
       throw error;
     }
   },
@@ -123,7 +87,7 @@ export const carServices = {
       await deleteDoc(doc(db, 'cars', carId));
       return true;
     } catch (error) {
-      console.error('❌ Error deleting car:', error);
+      console.error('Error deleting car:', error);
       throw error;
     }
   }
@@ -131,132 +95,75 @@ export const carServices = {
 
 // Booking Services
 export const bookingServices = {
-  // Get user's bookings
+  // Get user bookings
   async getUserBookings(userId) {
     try {
       const bookingsRef = collection(db, 'bookings');
       const q = query(
         bookingsRef,
-        where('clientId', '==', userId),
+        where('userId', '==', userId),
         orderBy('createdAt', 'desc')
       );
       const querySnapshot = await getDocs(q);
 
       const bookings = [];
       querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        bookings.push({
-          id: doc.id,
-          ...data,
-          pickupDate: data.pickupDate?.toDate?.() || data.pickupDate,
-          returnDate: data.returnDate?.toDate?.() || data.returnDate,
-          createdAt: data.createdAt?.toDate?.() || data.createdAt
-        });
+        bookings.push({ id: doc.id, ...doc.data() });
       });
 
       return bookings;
     } catch (error) {
-      console.error('❌ Error fetching user bookings:', error);
+      console.error('Error getting user bookings:', error);
       throw error;
     }
   },
 
-  // Get all bookings (for owners)
+  // Get all bookings (for admin)
   async getAllBookings() {
     try {
-      const q = query(collection(db, 'bookings'), orderBy('createdAt', 'desc'));
+      const bookingsRef = collection(db, 'bookings');
+      const q = query(bookingsRef, orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
 
       const bookings = [];
       querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        bookings.push({
-          id: doc.id,
-          ...data,
-          pickupDate: data.pickupDate?.toDate?.() || data.pickupDate,
-          returnDate: data.returnDate?.toDate?.() || data.returnDate,
-          createdAt: data.createdAt?.toDate?.() || data.createdAt
-        });
+        bookings.push({ id: doc.id, ...doc.data() });
       });
 
       return bookings;
     } catch (error) {
-      console.error('❌ Error fetching bookings:', error);
+      console.error('Error getting all bookings:', error);
       throw error;
     }
   },
 
   // Create booking
-  async createBooking(bookingData, userId) {
+  async createBooking(bookingData) {
     try {
-      // Get car details to calculate price
-      const car = await carServices.getCarById(bookingData.carId);
-      const startDate = new Date(bookingData.pickupDate);
-      const endDate = new Date(bookingData.returnDate);
-      const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-      const totalPrice = days * car.pricePerDay;
-
-      const bookingDoc = {
-        clientId: userId,
-        carId: bookingData.carId,
-        pickupDate: Timestamp.fromDate(startDate),
-        returnDate: Timestamp.fromDate(endDate),
-        totalPrice: totalPrice,
-        status: 'pending',
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
-      };
-
-      const docRef = await addDoc(collection(db, 'bookings'), bookingDoc);
-
-      return {
-        id: docRef.id,
-        ...bookingDoc,
-        pickupDate: startDate,
-        returnDate: endDate,
-        createdAt: new Date()
-      };
+      const bookingsRef = collection(db, 'bookings');
+      const docRef = await addDoc(bookingsRef, {
+        ...bookingData,
+        createdAt: new Date(),
+        status: 'pending'
+      });
+      return docRef.id;
     } catch (error) {
-      console.error('❌ Error creating booking:', error);
+      console.error('Error creating booking:', error);
       throw error;
     }
   },
 
   // Update booking status
-  async updateBookingStatus(bookingId, status, ownerId = null) {
+  async updateBookingStatus(bookingId, status) {
     try {
       const bookingRef = doc(db, 'bookings', bookingId);
-      const updateData = {
+      await updateDoc(bookingRef, {
         status: status,
-        updatedAt: Timestamp.now()
-      };
-
-      // If accepting booking, add acceptedAt timestamp
-      if (status === 'confirmed') {
-        updateData.acceptedAt = Timestamp.now();
-      }
-
-      await updateDoc(bookingRef, updateData);
-
-      // If booking is accepted and we have ownerId, create revenue record
-      if (status === 'confirmed' && ownerId) {
-        try {
-          // Get the booking details to create revenue record
-          const bookingDoc = await getDoc(bookingRef);
-          if (bookingDoc.exists()) {
-            const bookingData = { id: bookingDoc.id, ...bookingDoc.data() };
-            await revenueServices.createRevenueRecord(bookingData, ownerId);
-            console.log('💰 Revenue record created for accepted booking');
-          }
-        } catch (revenueError) {
-          console.error('❌ Error creating revenue record:', revenueError);
-          // Don't fail the booking update if revenue creation fails
-        }
-      }
-
+        updatedAt: new Date()
+      });
       return true;
     } catch (error) {
-      console.error('❌ Error updating booking status:', error);
+      console.error('Error updating booking status:', error);
       throw error;
     }
   }
@@ -271,43 +178,33 @@ export const reviewServices = {
       const q = query(
         reviewsRef,
         where('carId', '==', carId),
-        where('isActive', '==', true),
         orderBy('createdAt', 'desc')
       );
       const querySnapshot = await getDocs(q);
 
       const reviews = [];
       querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        reviews.push({
-          id: doc.id,
-          ...data,
-          createdAt: data.createdAt?.toDate?.() || data.createdAt
-        });
+        reviews.push({ id: doc.id, ...doc.data() });
       });
 
       return reviews;
     } catch (error) {
-      console.error('❌ Error fetching reviews:', error);
+      console.error('Error getting car reviews:', error);
       throw error;
     }
   },
 
   // Add review
-  async addReview(reviewData, userId) {
+  async addReview(reviewData) {
     try {
-      const reviewDoc = {
+      const reviewsRef = collection(db, 'reviews');
+      const docRef = await addDoc(reviewsRef, {
         ...reviewData,
-        userId: userId,
-        isActive: true,
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
-      };
-
-      const docRef = await addDoc(collection(db, 'reviews'), reviewDoc);
-      return { id: docRef.id, ...reviewDoc };
+        createdAt: new Date()
+      });
+      return docRef.id;
     } catch (error) {
-      console.error('❌ Error adding review:', error);
+      console.error('Error adding review:', error);
       throw error;
     }
   }
@@ -315,58 +212,35 @@ export const reviewServices = {
 
 // Revenue Services
 export const revenueServices = {
-  // Get owner's revenue records
-  async getOwnerRevenue(ownerId) {
+  // Get revenue data
+  async getRevenueData(ownerId) {
     try {
-      const revenueRef = collection(db, 'revenue');
-      const q = query(revenueRef, where('ownerId', '==', ownerId), orderBy('createdAt', 'desc'));
+      const bookingsRef = collection(db, 'bookings');
+      const q = query(
+        bookingsRef,
+        where('ownerId', '==', ownerId),
+        where('status', '==', 'completed')
+      );
       const querySnapshot = await getDocs(q);
 
-      const revenues = [];
+      let totalRevenue = 0;
+      const revenueData = [];
+
       querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        revenues.push({
+        const booking = doc.data();
+        totalRevenue += booking.totalAmount || 0;
+        revenueData.push({
           id: doc.id,
-          ...data,
-          createdAt: data.createdAt?.toDate?.() || data.createdAt
+          ...booking
         });
       });
 
-      return revenues;
-    } catch (error) {
-      console.error('❌ Error fetching owner revenue:', error);
-      throw error;
-    }
-  },
-
-  // Create revenue record when booking is accepted
-  async createRevenueRecord(bookingData, ownerId) {
-    try {
-      const revenueDoc = {
-        ownerId: ownerId,
-        bookingId: bookingData.id,
-        carId: bookingData.carId,
-        clientId: bookingData.clientId,
-        amount: bookingData.totalPrice,
-        description: `Revenue from booking: ${bookingData.carName || 'Car rental'}`,
-        createdAt: Timestamp.now()
+      return {
+        totalRevenue,
+        bookings: revenueData
       };
-
-      const docRef = await addDoc(collection(db, 'revenue'), revenueDoc);
-      return { id: docRef.id, ...revenueDoc };
     } catch (error) {
-      console.error('❌ Error creating revenue record:', error);
-      throw error;
-    }
-  },
-
-  // Get total revenue for owner
-  async getTotalRevenue(ownerId) {
-    try {
-      const revenues = await this.getOwnerRevenue(ownerId);
-      return revenues.reduce((total, revenue) => total + (revenue.amount || 0), 0);
-    } catch (error) {
-      console.error('❌ Error calculating total revenue:', error);
+      console.error('Error getting revenue data:', error);
       throw error;
     }
   }

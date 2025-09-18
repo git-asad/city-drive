@@ -67,6 +67,13 @@ const HowItWorks = () => {
           ))}
         </div>
 
+        {/* Bottom CTA */}
+        <div className='text-center mt-16'>
+          <p className='text-lg text-gray-600 mb-6'>Ready to experience the difference?</p>
+          <button className='bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-full font-bold hover:shadow-lg transition-all transform hover:scale-105'>
+            Start Your Booking
+          </button>
+        </div>
       </div>
     </div>
   );

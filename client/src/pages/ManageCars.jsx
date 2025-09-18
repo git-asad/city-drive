@@ -10,18 +10,15 @@ const ManageCars = () => {
     const addedCars = JSON.parse(localStorage.getItem('addedCars') || '[]');
     const dummyVisibility = JSON.parse(localStorage.getItem('dummyCarVisibility') || '{}');
     const dummyCarUpdates = JSON.parse(localStorage.getItem('dummyCarUpdates') || '{}');
-    const deletedDummyCars = JSON.parse(localStorage.getItem('deletedDummyCars') || '[]');
 
-    // Filter out deleted dummy cars and add visibility status and updates
-    const dummyCarsWithVisibility = dummyCarData
-      .filter(car => !deletedDummyCars.includes(car._id)) // Exclude deleted cars
-      .map(car => ({
-        ...car,
-        ...dummyCarUpdates[car._id], // Apply any updates
-        isVisible: dummyVisibility[car._id] !== false // Respect stored visibility, default true
-      }));
+    // Add visibility status and updates to dummy cars - default all to visible
+    const dummyCarsWithVisibility = dummyCarData.map(car => ({
+      ...car,
+      ...dummyCarUpdates[car._id], // Apply any updates
+      isVisible: true // All cars are visible by default
+    }));
 
-    // Ensure added cars respect their visibility
+    // Ensure added cars are also visible by default
     const addedCarsWithVisibility = addedCars.map(car => ({
       ...car,
       isVisible: car.isVisible !== false // Default to true if not set
@@ -41,7 +38,14 @@ const ManageCars = () => {
     fuel_type: ''
   });
 
+  // Clear visibility settings to make all cars visible
   useEffect(() => {
+    localStorage.removeItem('dummyCarVisibility');
+    // For added cars, ensure they are visible
+    const addedCars = JSON.parse(localStorage.getItem('addedCars') || '[]');
+    const updatedAddedCars = addedCars.map(car => ({ ...car, isVisible: true }));
+    localStorage.setItem('addedCars', JSON.stringify(updatedAddedCars));
+    // Reload cars to reflect changes
     setCars(loadCars());
   }, []);
 
@@ -63,16 +67,7 @@ const ManageCars = () => {
 
       if (updatedAddedCars.length !== addedCars.length) {
         localStorage.setItem('addedCars', JSON.stringify(updatedAddedCars));
-      } else {
-        // For dummy cars, track as deleted in localStorage
-        const deletedDummyCars = JSON.parse(localStorage.getItem('deletedDummyCars') || '[]');
-        if (!deletedDummyCars.includes(carId)) {
-          deletedDummyCars.push(carId);
-          localStorage.setItem('deletedDummyCars', JSON.stringify(deletedDummyCars));
-        }
       }
-
-      alert('Car deleted successfully!');
     }
   };
 

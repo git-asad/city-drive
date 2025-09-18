@@ -1,85 +1,187 @@
 import React, { useState, useEffect } from 'react';
-import { assets, ownerMenuLinks } from '../assets/assets';
+import { dummyDashboardData, assets, ownerMenuLinks, dummyUserData, dummyCarData } from '../assets/assets';
 import { useNavigate } from 'react-router-dom';
-import { bookingServices, carServices, revenueServices } from '../services/firebaseServices';
-import { useAuth } from '../context/AuthContext';
-import LoadingSpinner from '../Components/LoadingSpinner';
 
 const OwnerDashboard = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const [bookings, setBookings] = useState([]);
-  const [cars, setCars] = useState([]);
-  const [totalRevenue, setTotalRevenue] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [editingCar, setEditingCar] = useState(null);
+  const [editedCar, setEditedCar] = useState({});
 
+  // Clear customer bookings on component mount
   useEffect(() => {
-    const loadDashboardData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+    localStorage.removeItem('customerBookings');
+  }, []);
 
-        // Load all data from Firebase
-        console.log('📊 Loading dashboard data for owner...');
-        const [allBookings, ownerCars, revenue] = await Promise.all([
-          bookingServices.getAllBookings(),
-          carServices.getOwnerCars(user.id),
-          revenueServices.getTotalRevenue(user.id)
-        ]);
+  // Calculate dynamic total cars (dummy data + added cars from localStorage)
+  const getTotalCars = () => {
+    const addedCars = JSON.parse(localStorage.getItem('addedCars') || '[]');
+    return dummyCarData.length + addedCars.length;
+  };
 
-        // Filter bookings to only show those for owner's cars
-        const ownerBookings = allBookings.filter(booking =>
-          ownerCars.some(car => car.id === booking.carId)
-        );
+  // Get all cars (dummy data + added cars) for management
+  const getAllCars = () => {
+    const addedCars = JSON.parse(localStorage.getItem('addedCars') || '[]');
+    const dummyVisibility = JSON.parse(localStorage.getItem('dummyCarVisibility') || '{}');
 
-        console.log(`✅ Owner loaded ${ownerBookings.length} bookings, ${ownerCars.length} cars, $${revenue} revenue`);
-        setBookings(ownerBookings);
-        setCars(ownerCars);
-        setTotalRevenue(revenue);
+    // Add visibility status to dummy cars
+    const dummyCarsWithVisibility = dummyCarData.map(car => ({
+      ...car,
+      isVisible: dummyVisibility[car._id] !== false // Default to true if not set
+    }));
 
-      } catch (err) {
-        console.error('❌ Error loading dashboard data:', err);
-        setError('Failed to load dashboard data. Please refresh the page or contact support.');
-      } finally {
-        setLoading(false);
-      }
-    };
+    return [...dummyCarsWithVisibility, ...addedCars];
+  };
 
-    if (user?.id) {
-      loadDashboardData();
-    }
-  }, [user]);
+  // Get only visible cars for featured section
+  const getFeaturedCars = () => {
+    const allCars = getAllCars();
+    return allCars.filter(car => car.isVisible !== false).slice(0, 4);
+  };
+
+  // Calculate dynamic statistics
+  const getMonthlyRevenue = () => {
+    const customerBookings = JSON.parse(localStorage.getItem('customerBookings') || '[]');
+    // Calculate revenue from actual bookings
+    const totalRevenue = customerBookings.reduce((sum, booking) => sum + booking.price, 0);
+    return totalRevenue;
+  };
+
+  const getTotalBookings = () => {
+    const customerBookings = JSON.parse(localStorage.getItem('customerBookings') || '[]');
+    return customerBookings.length;
+  };
 
   const getPendingBookings = () => {
-    return bookings.filter(booking => booking.status === 'pending').length;
+    const customerBookings = JSON.parse(localStorage.getItem('customerBookings') || '[]');
+    return customerBookings.filter(booking => booking.status === 'pending').length;
   };
 
   const getConfirmedBookings = () => {
-    return bookings.filter(booking => booking.status === 'confirmed').length;
+    const customerBookings = JSON.parse(localStorage.getItem('customerBookings') || '[]');
+    return customerBookings.filter(booking => booking.status === 'confirmed').length;
   };
 
-  const featuredCars = cars.slice(0, 4);
+  const featuredCars = getFeaturedCars();
 
+  const handleEditCar = (car) => {
+    setEditingCar(car._id);
+    setEditedCar({ ...car });
+  };
 
-  const acceptBooking = async (bookingId) => {
+  const handleSaveCar = () => {
     try {
-      // Use Firebase booking service
-      await bookingServices.updateBookingStatus(bookingId, 'confirmed', user.id);
+      // Check if this is an added car (from localStorage)
+      const addedCars = JSON.parse(localStorage.getItem('addedCars') || '[]');
+      const carIndex = addedCars.findIndex(car => car._id === editedCar._id);
 
-      alert('Booking accepted successfully! Revenue has been added to your dashboard.');
-      window.location.reload(); // Refresh to show updated status and revenue
+      if (carIndex !== -1) {
+        // Update the car in localStorage
+        addedCars[carIndex] = { ...addedCars[carIndex], ...editedCar };
+        localStorage.setItem('addedCars', JSON.stringify(addedCars));
+        console.log('Updated car in localStorage:', editedCar);
+      } else {
+        // For dummy cars, we could implement similar logic if needed
+        console.log('Updated dummy car (not persisted):', editedCar);
+      }
+
+      alert('Car details updated successfully!');
+      setEditingCar(null);
+      setEditedCar({});
+
+      // Force a re-render by updating the featured cars
+      // This will refresh the display with updated data
+      window.location.reload();
+
+    } catch (error) {
+      console.error('Error updating car:', error);
+      alert('Failed to update car details. Please try again.');
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCar(null);
+    setEditedCar({});
+  };
+
+  const handleDeleteCar = (carId) => {
+    if (window.confirm('Are you sure you want to delete this car?')) {
+      try {
+        // Check if this is an added car (from localStorage)
+        const addedCars = JSON.parse(localStorage.getItem('addedCars') || '[]');
+        const updatedAddedCars = addedCars.filter(car => car._id !== carId);
+
+        if (updatedAddedCars.length !== addedCars.length) {
+          // This was an added car, remove from localStorage
+          localStorage.setItem('addedCars', JSON.stringify(updatedAddedCars));
+          alert('Car deleted successfully!');
+          window.location.reload(); // Refresh to show updated data
+        } else {
+          // This is a dummy car, we can't delete it from the original data
+          alert('Cannot delete original cars. You can only delete cars you added.');
+        }
+      } catch (error) {
+        console.error('Error deleting car:', error);
+        alert('Failed to delete car. Please try again.');
+      }
+    }
+  };
+
+  const toggleCarVisibility = (carId) => {
+    try {
+      // Check if this is an added car (from localStorage)
+      const addedCars = JSON.parse(localStorage.getItem('addedCars') || '[]');
+      const carIndex = addedCars.findIndex(car => car._id === carId);
+
+      if (carIndex !== -1) {
+        // Update the added car in localStorage
+        addedCars[carIndex].isVisible = !addedCars[carIndex].isVisible;
+        localStorage.setItem('addedCars', JSON.stringify(addedCars));
+        alert(`Car is now ${addedCars[carIndex].isVisible ? 'visible' : 'hidden'} to customers!`);
+        window.location.reload(); // Refresh to show updated data
+      } else {
+        // For dummy cars, store visibility status separately
+        const dummyVisibility = JSON.parse(localStorage.getItem('dummyCarVisibility') || '{}');
+        const currentVisibility = dummyVisibility[carId] !== false; // Default to true if not set
+        dummyVisibility[carId] = !currentVisibility;
+        localStorage.setItem('dummyCarVisibility', JSON.stringify(dummyVisibility));
+        alert(`Car is now ${dummyVisibility[carId] ? 'visible' : 'hidden'} to customers!`);
+        window.location.reload(); // Refresh to show updated data
+      }
+    } catch (error) {
+      console.error('Error toggling car visibility:', error);
+      alert('Failed to update car visibility. Please try again.');
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    setEditedCar(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const acceptBooking = (bookingId) => {
+    try {
+      const customerBookings = JSON.parse(localStorage.getItem('customerBookings') || '[]');
+      const updatedBookings = customerBookings.map(booking =>
+        booking._id === bookingId ? { ...booking, status: 'confirmed' } : booking
+      );
+      localStorage.setItem('customerBookings', JSON.stringify(updatedBookings));
+      alert('Booking accepted successfully!');
+      window.location.reload(); // Refresh to show updated status
     } catch (error) {
       console.error('Error accepting booking:', error);
       alert('Failed to accept booking. Please try again.');
     }
   };
 
-  const rejectBooking = async (bookingId) => {
+  const rejectBooking = (bookingId) => {
     try {
-      // Use Firebase booking service
-      await bookingServices.updateBookingStatus(bookingId, 'cancelled', user.id);
-
+      const customerBookings = JSON.parse(localStorage.getItem('customerBookings') || '[]');
+      const updatedBookings = customerBookings.map(booking =>
+        booking._id === bookingId ? { ...booking, status: 'cancelled' } : booking
+      );
+      localStorage.setItem('customerBookings', JSON.stringify(updatedBookings));
       alert('Booking rejected.');
       window.location.reload(); // Refresh to show updated status
     } catch (error) {
@@ -91,14 +193,14 @@ const OwnerDashboard = () => {
   const stats = [
     {
       title: 'Total Cars',
-      value: cars.length,
+      value: getTotalCars(),
       icon: assets.carIcon,
       color: 'from-blue-500 to-blue-600',
       bgColor: 'bg-blue-50'
     },
     {
       title: 'Total Bookings',
-      value: bookings.length,
+      value: getTotalBookings(),
       icon: assets.listIcon,
       color: 'from-green-500 to-green-600',
       bgColor: 'bg-green-50'
@@ -133,37 +235,6 @@ const OwnerDashboard = () => {
       currency: 'USD'
     }).format(amount);
   };
-
-  if (loading) {
-    return (
-      <div className='flex min-h-screen bg-gray-50'>
-        <div className='w-64 bg-white shadow-lg'></div>
-        <div className='flex-1 p-8 flex items-center justify-center'>
-          <LoadingSpinner />
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className='flex min-h-screen bg-gray-50'>
-        <div className='w-64 bg-white shadow-lg'></div>
-        <div className='flex-1 p-8 flex items-center justify-center'>
-          <div className='text-center'>
-            <h2 className='text-xl font-bold text-red-600 mb-2'>Error</h2>
-            <p>{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className='mt-4 px-4 py-2 bg-blue-600 text-white rounded'
-            >
-              Retry
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className='flex min-h-screen bg-gray-50'>
@@ -213,15 +284,15 @@ const OwnerDashboard = () => {
           <p className='text-gray-600'>Welcome back! Here's what's happening with your cars.</p>
         </div>
 
-          {/* Total Revenue */}
+          {/* Monthly Revenue */}
           <div className='bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-8 text-white mb-8 shadow-lg'>
             <div className='flex items-center justify-between'>
               <div>
-                <h2 className='text-2xl font-bold mb-2'>Total Revenue</h2>
-                <p className='text-green-100'>All-time earnings from confirmed bookings</p>
+                <h2 className='text-2xl font-bold mb-2'>Monthly Revenue</h2>
+                <p className='text-green-100'>Current month earnings</p>
               </div>
               <div className='text-right'>
-                <div className='text-4xl font-bold'>{formatCurrency(totalRevenue)}</div>
+                <div className='text-4xl font-bold'>{formatCurrency(getMonthlyRevenue())}</div>
                 <div className='text-green-100 text-sm'>+12% from last month</div>
               </div>
             </div>
@@ -254,7 +325,8 @@ const OwnerDashboard = () => {
 
             <div className='divide-y divide-gray-200'>
               {(() => {
-                const recentBookings = bookings.slice(-5).reverse(); // Get last 5 bookings, most recent first
+                const customerBookings = JSON.parse(localStorage.getItem('customerBookings') || '[]');
+                const recentBookings = customerBookings.slice(-5).reverse(); // Get last 5 bookings, most recent first
 
                 if (recentBookings.length === 0) {
                   return (
@@ -265,33 +337,46 @@ const OwnerDashboard = () => {
                 }
 
                 return recentBookings.map((booking, index) => {
-                  const carData = cars.find(car => car.id === booking.carId) || {};
+                  // Find the car in our combined data (dummy + added cars)
+                  const addedCars = JSON.parse(localStorage.getItem('addedCars') || '[]');
+                  const dummyCarUpdates = JSON.parse(localStorage.getItem('dummyCarUpdates') || '{}');
+
+                  // Apply updates to dummy cars
+                  const dummyCarsWithUpdates = dummyCarData.map(car => ({
+                    ...car,
+                    ...dummyCarUpdates[car._id]
+                  }));
+
+                  const allCars = [...dummyCarsWithUpdates, ...addedCars];
+                  const carData = allCars.find(car => car._id === booking.car._id) || booking.car;
 
                   return (
-                    <div key={booking.id || index} className='p-6 hover:bg-gray-50 transition-colors'>
+                    <div key={booking._id || index} className='p-6 hover:bg-gray-50 transition-colors'>
                       <div className='flex items-center justify-between'>
                         <div className='flex items-center gap-4'>
                           <img
-                            src={carData.images?.[0] || carData.imageURL || carData.image || assets.main_car}
-                            alt={carData.brand || carData.name || 'Car'}
+                            src={carData.image}
+                            alt={carData.brand}
                             className='w-16 h-16 rounded-lg object-cover'
                           />
                           <div>
                             <h4 className='font-semibold text-gray-900'>
-                              {carData.brand || carData.name || 'Car'} {carData.model || ''}
+                              {carData.brand} {carData.model}
                             </h4>
                             <p className='text-gray-600 text-sm'>
                               {formatDate(booking.pickupDate)} - {formatDate(booking.returnDate)}
                             </p>
-                            <p className='text-gray-500 text-sm'>{carData.location || 'Location not specified'}</p>
-                            <p className='text-gray-500 text-xs mt-1'>
-                              Customer: {booking.customerName || 'N/A'}
-                            </p>
+                            <p className='text-gray-500 text-sm'>{booking.pickupLocation || carData.location}</p>
+                            {booking.customerInfo && (
+                              <p className='text-gray-500 text-xs mt-1'>
+                                Customer: {booking.customerInfo.firstName} {booking.customerInfo.lastName}
+                              </p>
+                            )}
                           </div>
                         </div>
 
                         <div className='text-right flex flex-col items-end gap-2'>
-                          <div className='font-bold text-gray-900'>{formatCurrency(booking.totalPrice)}</div>
+                          <div className='font-bold text-gray-900'>{formatCurrency(booking.price)}</div>
                           <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
                             booking.status === 'confirmed'
                               ? 'bg-green-100 text-green-800'
@@ -305,13 +390,13 @@ const OwnerDashboard = () => {
                           {booking.status === 'pending' && (
                             <div className='flex gap-2'>
                               <button
-                                onClick={() => acceptBooking(booking.id)}
+                                onClick={() => acceptBooking(booking._id)}
                                 className='px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors'
                               >
                                 Accept
                               </button>
                               <button
-                                onClick={() => rejectBooking(booking.id)}
+                                onClick={() => rejectBooking(booking._id)}
                                 className='px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors'
                               >
                                 Reject
@@ -335,6 +420,7 @@ const OwnerDashboard = () => {
               </button>
             </div>
           </div>
+
 
 
 
